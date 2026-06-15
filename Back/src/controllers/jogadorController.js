@@ -1,7 +1,7 @@
 const db = require('../database');
 
 async function criarJogador(request, reply) {
-  const { nome, posicao, timeId } = request.body;
+  const { nome, idade, posicao, numeroCamisa, timeId } = request.body;
 
   // precisa existir pelo menos um time cadastrado
   const existeAlgumTime = await db.times.findOneAsync({});
@@ -16,6 +16,27 @@ async function criarJogador(request, reply) {
     return reply.code(400).send({
       sucesso: false,
       erro: 'O campo "nome" é obrigatório',
+    });
+  }
+
+  if (!idade || idade.trim() === '') {
+    return reply.code(400).send({
+      sucesso: false,
+      erro: 'O campo "idade" é obrigatório',
+    });
+  }
+
+  if (!posicao || posicao.trim() === '') {
+    return reply.code(400).send({
+      sucesso: false,
+      erro: 'O campo "posicao" é obrigatório',
+    });
+  }
+
+  if (!numeroCamisa || numeroCamisa.trim() === '') {
+    return reply.code(400).send({
+      sucesso: false,
+      erro: 'O campo "numeroCamisa" é obrigatório',
     });
   }
 
@@ -36,7 +57,9 @@ async function criarJogador(request, reply) {
 
   const jogador = await db.jogadores.insertAsync({
     nome: nome.trim(),
+    idade: idade,
     posicao: posicao || null,
+    numeroCamisa: numeroCamisa,
     timeId,
   });
 
