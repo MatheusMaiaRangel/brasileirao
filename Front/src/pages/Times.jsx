@@ -38,7 +38,8 @@ export default function App() {
             carregarTimes();
         } catch (error) {
             console.error(error);
-            alert("Erro ao remover time");
+            const serverMsg = error?.response?.data?.erro || error?.response?.data?.mensagem || error?.message;
+            alert(serverMsg || "Erro ao remover time");
         }
     }
 
