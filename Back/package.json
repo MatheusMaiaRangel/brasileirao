@@ -1,16 +1,23 @@
 {
   "name": "back",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "API REST com Fastify e NeDB do Brasileirão",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js",
+    "dev": "nodemon server.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@fastify/cors": "^11.0.0",
+    "@seald-io/nedb": "^4.0.4",
+    "dotenv": "^16.4.5",
     "fastify": "^5.8.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
   }
 }
