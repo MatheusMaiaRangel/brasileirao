@@ -2,7 +2,10 @@ require('dotenv').config();
 
 const fastify = require('fastify')({ logger: true });
 
-fastify.register(require('@fastify/cors'));
+fastify.register(require('@fastify/cors'),{
+  origin: '*',
+  methods:['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS']
+});
 fastify.register(require('./src/routes/timeRoutes'));
 fastify.register(require('./src/routes/jogadorRoutes'));
 
