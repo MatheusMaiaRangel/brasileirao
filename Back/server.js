@@ -4,6 +4,7 @@ const fastify = require('fastify')({ logger: true });
 
 fastify.register(require('@fastify/cors'));
 fastify.register(require('./src/routes/timeRoutes'));
+fastify.register(require('./src/routes/jogadorRoutes'));
 
 fastify.get('/', async () => {
   return { status: 'ok', mensagem: 'API Fastify + NeDB funcionando!' };

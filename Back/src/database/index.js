@@ -7,8 +7,15 @@ const db = {
     autoload: true,
     timestampData: true,
   }),
+  jogadores: new Datastore({
+    filename: path.join(__dirname, '../../data/jogadores.db'),
+    autoload: true,
+    timestampData: true,
+  }),
 };
 
 db.times.ensureIndexAsync({ fieldName: 'nome' });
+db.jogadores.ensureIndexAsync({ fieldName: 'nome' });
+db.jogadores.ensureIndexAsync({ fieldName: 'timeId' });
 
 module.exports = db;
