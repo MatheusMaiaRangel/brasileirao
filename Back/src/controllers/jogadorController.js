@@ -128,9 +128,9 @@ async function editarJogador(request, reply) {
     update.idade = idade;
   } 
 
-  if (posicao !== undefined){
-    update.posicao = posicao;
-  } 
+  if (posicao && String(posicao).trim() !== ''){
+    update.posicao = String(posicao).trim();
+  }
 
   if (numeroCamisa !== undefined){
     update.numeroCamisa = numeroCamisa;

@@ -3,6 +3,7 @@ const {
   deletarTime,
   buscarTime,
   listarTimes,
+  editarTime
 } = require('../controllers/timeController');
 const {
   listarJogadoresPorTime,
@@ -14,6 +15,7 @@ async function timeRoutes(fastify) {
   fastify.get('/times/:timeId/jogadores', listarJogadoresPorTime);
   fastify.delete('/times/:id', deletarTime);
   fastify.get('/times', listarTimes);
+  fastify.put('/times/:id', editarTime);
 }
 
 module.exports = timeRoutes;
