@@ -37,6 +37,14 @@ async function criarTime(request, reply) {
 async function deletarTime(request, reply) {
   const { id } = request.params;
 
+  const jogadorVinculado = await db.jogadores.findOneAsync({ timeId: id });
+  if (jogadorVinculado) {
+    return reply.code(409).send({
+      sucesso: false,
+      erro: 'Não é possível deletar o time porque existem jogadores vinculados a ele',
+    });
+  }
+
   const numRemoved = await db.times.removeAsync({ _id: id }, {});
 
   if (numRemoved === 0) {
