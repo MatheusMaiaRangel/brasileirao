@@ -1,2 +1,4 @@
-{"nome":"Flamengo","estadio":"null","anoFundacao":1825,"_id":"SLa9Afxp0qJnWJK4","createdAt":{"$$date":1781492836791},"updatedAt":{"$$date":1781554976231}}
+{"nome":"Flamengo","estadio":"null","anoFundacao":"1825","_id":"SLa9Afxp0qJnWJK4","createdAt":{"$$date":1781492836791},"updatedAt":{"$$date":1781556579910}}
 {"$$indexCreated":{"fieldName":"nome","unique":false,"sparse":false}}
+{"nome":"fatec lakers","estadio":"herminio ometto","anoFundacao":"1915","_id":"F1sV4q5sJyZJxHs6","createdAt":{"$$date":1781556880567},"updatedAt":{"$$date":1781556880567}}
+{"$$deleted":true,"_id":"F1sV4q5sJyZJxHs6"}

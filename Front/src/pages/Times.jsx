@@ -4,6 +4,8 @@ import api from "../services/api";
 export default function App() {
 const [times, setTimes] = useState([]);
 const [form, setForm] = useState({ nome: "", estadio: "", anoFundacao: "" });
+const [showEdit, setShowEdit] = useState(false);
+const [editingTime, setEditingTime] = useState(null);
 
 async function carregarTimes() {
 try {
@@ -40,6 +42,32 @@ alert("Erro ao remover time");
 }
 }
 
+function abrirEditarTime(time) {
+	setEditingTime({ ...time });
+	setShowEdit(true);
+}
+
+function fecharEditar() {
+	setEditingTime(null);
+	setShowEdit(false);
+}
+
+async function atualizarTime(e) {
+	e.preventDefault();
+	if (!editingTime) return;
+	const id = editingTime.id || editingTime._id;
+	if (!id) return alert("ID do time não encontrado para atualização");
+	try {
+		await api.put(`/times/${id}`, editingTime);
+		setShowEdit(false);
+		setEditingTime(null);
+		carregarTimes();
+	} catch (error) {
+		console.error(error);
+		alert("Erro ao atualizar time");
+	}
+}
+
 return (
 <div style={{ minHeight: "100vh", background: "#0e1410", color: "#eef1ee", fontFamily: "'Inter', system-ui, sans-serif" }}>
 <style>{`
@@ -64,6 +92,9 @@ transition: border-color .15s;
 .del-btn { opacity: 0; transition: opacity .15s, color .15s; }
 .card-team:hover .del-btn { opacity: 1; }
 .del-btn:hover { color: #f3716b !important; }
+.edit-btn { opacity: 0; transition: opacity .15s, color .15s; margin-right:8px }
+.card-team:hover .edit-btn { opacity: 1; }
+.edit-btn:hover { color: #ffd166 !important; }
 `}</style>
 
 {/* Header */}
@@ -136,14 +167,19 @@ Nenhum clube cadastrado ainda. Use o formulário acima para adicionar o primeiro
 background: "#131b16", border: "1px solid #1f2a23", borderRadius: 8,
 padding: 18, display: "flex", flexDirection: "column", gap: 10, position: "relative"
 }}>
-<button className="del-btn" onClick={() => deletarTime(time.id || time._id)} title="Remover clube" style={{
-position: "absolute", top: 14, right: 14, background: "transparent",
-border: "none", color: "#6b7a70", cursor: "pointer", fontSize: 13,
-fontFamily: "inherit", letterSpacing: "0.05em"
+<div style={{ position: "absolute", top: 14, right: 14, display: "flex" }}>
+<button className="edit-btn" onClick={() => abrirEditarTime(time)} title="Editar clube" style={{
+background: "transparent", border: "none", color: "#6b7a70", cursor: "pointer", fontSize: 13, fontFamily: "inherit", letterSpacing: "0.05em"
 }}>
-remover
+Editar
 </button>
-
+<button className="del-btn" onClick={() => deletarTime(time.id || time._id)} title="Remover clube" style={{
+background: "transparent", border: "none", color: "#6b7a70", cursor: "pointer", fontSize: 13,
+fontFamily: "inherit", letterSpacing: "0.05em", marginLeft: 8
+}}>
+Remover
+</button>
+</div>
 <div style={{ fontFamily: "Oswald, sans-serif", fontSize: 19, fontWeight: 600, paddingRight: 56 }}>
 {time.nome}
 </div>
@@ -163,6 +199,29 @@ remover
 </div>
 )}
 </section>
+
+{showEdit && editingTime && (
+	<div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 60 }}>
+		<div style={{ width: 520, background: "#0e1410", border: "1px solid #1f2a23", borderRadius: 8, padding: 20 }}>
+			<div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+				<div style={{ fontFamily: "Oswald, sans-serif", fontSize: 16, color: "#3fb950", fontWeight: 600 }}>Editar Clube</div>
+				<button onClick={() => fecharEditar()} style={{ background: "transparent", border: "none", color: "#d4220a", cursor: "pointer" }}>X</button>
+			</div>
+			<form onSubmit={atualizarTime} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+				<input className="field" type="text" placeholder="Nome do clube" value={editingTime.nome || ""}
+					onChange={(e) => setEditingTime({ ...editingTime, nome: e.target.value })} required />
+				<input className="field" type="text" placeholder="Estádio" value={editingTime.estadio || ""}
+					onChange={(e) => setEditingTime({ ...editingTime, estadio: e.target.value })} required />
+				<input className="field" type="number" placeholder="Fundação" value={editingTime.anoFundacao || ""}
+					onChange={(e) => setEditingTime({ ...editingTime, anoFundacao: e.target.value })} required />
+				<div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+					<button type="submit" style={{ background: "#3fb950", color: "#0e1410", border: "none", borderRadius: 6, padding: "8px 14px", fontWeight: 600, cursor: "pointer" }}>Salvar</button>
+					<button type="button" onClick={() => fecharEditar()} style={{ background: "transparent", color: "#6b7a70", border: "1px solid #2a352e", borderRadius: 6, padding: "8px 12px", cursor: "pointer" }}>Cancelar</button>
+				</div>
+			</form>
+		</div>
+	</div>
+)}
 </div>
 </div>
 );
