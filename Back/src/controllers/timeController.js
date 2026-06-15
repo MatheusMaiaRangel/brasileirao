@@ -49,6 +49,21 @@ async function deletarTime(request, reply) {
   return reply.code(204).send();
 }
 
+async function buscarTime(request, reply) {
+  const { id } = request.params;
+
+  const time = await db.times.findOneAsync({ _id: id });
+
+  if (!time) {
+    return reply.code(404).send({
+      sucesso: false,
+      erro: 'Time não encontrado',
+    });
+  }
+
+  return reply.send({ sucesso: true, dados: time });
+}
+
 async function listarTimes(request, reply) {
     const times = await db.times.findAsync({});
     return reply.send({ sucesso: true, dados: times });
@@ -57,5 +72,6 @@ async function listarTimes(request, reply) {
 module.exports = {
   criarTime,
   deletarTime,
+  buscarTime,
   listarTimes,
 };
