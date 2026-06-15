@@ -106,8 +106,71 @@ async function listarJogadoresPorTime(request, reply) {
   });
 }
 
+async function editarJogador(request, reply) {
+  const { id } = request.params;
+  const { nome, idade, posicao, numeroCamisa, timeId } = request.body;
+
+  const jogador = await db.jogadores.findOneAsync({ _id: id });
+  if (!jogador) {
+    return reply.code(404).send({ sucesso: false, erro: 'Jogador não encontrado' });
+  }
+
+  if (!nome && !idade && !posicao && !numeroCamisa && !timeId) {
+    return reply.code(400).send({ sucesso: false, erro: 'Nenhum campo para atualizar' });
+  }
+
+  const update = {};
+  if (nome && String(nome).trim() !== ''){
+    update.nome = String(nome).trim();
+  }
+
+  if (idade !== undefined){
+    update.idade = idade;
+  } 
+
+  if (posicao !== undefined){
+    update.posicao = posicao;
+  } 
+
+  if (numeroCamisa !== undefined){
+    update.numeroCamisa = numeroCamisa;
+  } 
+  
+  if (timeId !== undefined) {
+    const time = await db.times.findOneAsync({ _id: timeId });
+    if (!time) {
+      return reply.code(400).send({ sucesso: false, erro: 'Time associado não encontrado' });
+    }
+    update.timeId = timeId;
+  }
+
+  // garantir que o update seja persistido usando callback
+  try {
+    await new Promise((resolve, reject) => {
+      db.jogadores.update({ _id: id }, { $set: update }, {}, (err /*, numAffected */) => {
+        if (err) return reject(err);
+        resolve();
+      });
+    });
+  } catch (err) {
+    return reply.code(500).send({ sucesso: false, erro: 'Erro ao atualizar jogador' });
+  }
+
+  const jogadorAtualizado = await db.jogadores.findOneAsync({ _id: id });
+
+  // compacta o datafile usando a instância em execução (aguarda conclusão)
+  try {
+    await new Promise((resolve) => db.jogadores.compactDatafile(resolve));
+  } catch (err) {
+    // não bloquear a resposta se a compactação falhar
+  }
+
+  return reply.send({ sucesso: true, dados: jogadorAtualizado });
+}
+
 module.exports = {
   criarJogador,
+  editarJogador,
   deletarJogador,
   listarJogadores,
   listarJogadoresPorTime,

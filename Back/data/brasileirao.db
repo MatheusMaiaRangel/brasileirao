@@ -1,5 +1,3 @@
 {"nome":"Flamengo","estadio":"Maracanã","anoFundacao":1825,"_id":"SLa9Afxp0qJnWJK4","createdAt":{"$$date":1781492836791},"updatedAt":{"$$date":1781492836791}}
-{"nome":"São Paulo","estadio":"Morumbi","anoFundacao":1930,"_id":"W4CcP9Fg27vKC3iQ","createdAt":{"$$date":1781493639312},"updatedAt":{"$$date":1781493639312}}
 {"$$indexCreated":{"fieldName":"nome","unique":false,"sparse":false}}
 {"$$indexCreated":{"fieldName":"nome"}}
-{"$$deleted":true,"_id":"W4CcP9Fg27vKC3iQ"}

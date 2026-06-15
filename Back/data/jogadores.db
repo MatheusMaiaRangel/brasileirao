@@ -1,6 +1,6 @@
 {"nome":"Bruno Henrique","idade":"","posicao":"Ponta esquerda","numeroCamisa":"","timeId":"SLa9Afxp0qJnWJK4","_id":"GdoFGLj6BNuXxJ2R","createdAt":{"$$date":1781495440016},"updatedAt":{"$$date":1781495440016}}
+{"nome":"julio","idade":"25","posicao":"Ponta esquerda","numeroCamisa":"7","timeId":"SLa9Afxp0qJnWJK4","_id":"xe48UlqiwcmNJVSn","createdAt":{"$$date":1781539774476},"updatedAt":{"$$date":1781539774476}}
 {"$$indexCreated":{"fieldName":"nome","unique":false,"sparse":false}}
 {"$$indexCreated":{"fieldName":"timeId","unique":false,"sparse":false}}
 {"$$indexCreated":{"fieldName":"nome"}}
 {"$$indexCreated":{"fieldName":"timeId"}}
-{"nome":"julio","idade":"25","posicao":"Ponta esquerda","numeroCamisa":"7","timeId":"SLa9Afxp0qJnWJK4","_id":"xe48UlqiwcmNJVSn","createdAt":{"$$date":1781539774476},"updatedAt":{"$$date":1781539774476}}
