@@ -59,12 +59,33 @@ async function deletarJogador(request, reply) {
 }
 
 async function listarJogadores(request, reply) {
-    const jogadores = await db.jogadores.findAsync({});
-    return reply.send({ sucesso: true, dados: jogadores });
+  const jogadores = await db.jogadores.findAsync({});
+  return reply.send({ sucesso: true, dados: jogadores });
+}
+
+async function listarJogadoresPorTime(request, reply) {
+  const { timeId } = request.params;
+
+  const time = await db.times.findOneAsync({ _id: timeId });
+  if (!time) {
+    return reply.code(404).send({
+      sucesso: false,
+      erro: 'Time não encontrado',
+    });
   }
+
+  const jogadores = await db.jogadores.findAsync({ timeId });
+
+  return reply.send({
+    sucesso: true,
+    total: jogadores.length,
+    dados: jogadores,
+  });
+}
 
 module.exports = {
   criarJogador,
   deletarJogador,
   listarJogadores,
+  listarJogadoresPorTime,
 };
