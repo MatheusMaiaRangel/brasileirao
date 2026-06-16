@@ -1,7 +1,8 @@
-{"nome":"Bruno Henrique","idade":"","posicao":"Ponta esquerda","numeroCamisa":"","timeId":"SLa9Afxp0qJnWJK4","_id":"GdoFGLj6BNuXxJ2R","createdAt":{"$$date":1781495440016},"updatedAt":{"$$date":1781495440016}}
-{"nome":"julio","idade":"25","posicao":"Ponta esquerda","numeroCamisa":"7","timeId":"SLa9Afxp0qJnWJK4","_id":"xe48UlqiwcmNJVSn","createdAt":{"$$date":1781539774476},"updatedAt":{"$$date":1781539774476}}
+{"nome":"Bruno Henrique","idade":"35","posicao":"Ponta esquerda","numeroCamisa":"27","timeId":"SLa9Afxp0qJnWJK4","_id":"GdoFGLj6BNuXxJ2R","createdAt":{"$$date":1781495440016},"updatedAt":{"$$date":1781621798820}}
+{"nome":"Arrascaeta","idade":"32","posicao":"Meia","numeroCamisa":"10","timeId":"SLa9Afxp0qJnWJK4","_id":"IEFYMrNLTWt07DbZ","createdAt":{"$$date":1781567924799},"updatedAt":{"$$date":1781621881079}}
+{"nome":"Danilo","idade":"34","posicao":"Lateral","numeroCamisa":"13","timeId":"SLa9Afxp0qJnWJK4","_id":"OofLugFG2o5xRqFs","createdAt":{"$$date":1781622031756},"updatedAt":{"$$date":1781622031756}}
+{"nome":"Rossi","idade":"30","posicao":"Goleiro","numeroCamisa":"1","timeId":"SLa9Afxp0qJnWJK4","_id":"xe48UlqiwcmNJVSn","createdAt":{"$$date":1781539774476},"updatedAt":{"$$date":1781621975419}}
 {"$$indexCreated":{"fieldName":"nome","unique":false,"sparse":false}}
 {"$$indexCreated":{"fieldName":"timeId","unique":false,"sparse":false}}
 {"$$indexCreated":{"fieldName":"nome"}}
 {"$$indexCreated":{"fieldName":"timeId"}}
-{"nome":"Arrascaeta","idade":"67","posicao":"GOL","numeroCamisa":"14","timeId":"SLa9Afxp0qJnWJK4","_id":"IEFYMrNLTWt07DbZ","createdAt":{"$$date":1781567924799},"updatedAt":{"$$date":1781567924799}}

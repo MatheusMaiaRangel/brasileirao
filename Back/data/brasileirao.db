@@ -1,4 +1,4 @@
-{"nome":"Flamengo","estadio":"null","anoFundacao":"1825","_id":"SLa9Afxp0qJnWJK4","createdAt":{"$$date":1781492836791},"updatedAt":{"$$date":1781556579910}}
+{"nome":"Palmeiras","estadio":"Nubank Parque","anoFundacao":"1914","_id":"Gtv82e3WVtKffWwf","createdAt":{"$$date":1781621767042},"updatedAt":{"$$date":1781621767042}}
+{"nome":"Flamengo","estadio":"Maracanã","anoFundacao":"1895","_id":"SLa9Afxp0qJnWJK4","createdAt":{"$$date":1781492836791},"updatedAt":{"$$date":1781627202060},"imagem":"/uploads/1781627202057-Flamengo_3D.png"}
+{"nome":"São Paulo","estadio":"MorumBIS","anoFundacao":"1930","_id":"zsvTBTGBMksXFytL","createdAt":{"$$date":1781621738456},"updatedAt":{"$$date":1781621738456}}
 {"$$indexCreated":{"fieldName":"nome","unique":false,"sparse":false}}
-{"nome":"fatec lakers","estadio":"herminio ometto","anoFundacao":"1915","_id":"F1sV4q5sJyZJxHs6","createdAt":{"$$date":1781556880567},"updatedAt":{"$$date":1781556880567}}
-{"$$deleted":true,"_id":"F1sV4q5sJyZJxHs6"}
