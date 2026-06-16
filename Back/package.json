@@ -13,7 +13,7 @@
   "type": "commonjs",
   "dependencies": {
     "@fastify/cors": "^11.0.0",
-    "@fastify/multipart": "^6.0.0",
+    "@fastify/multipart": "^10.0.0",
     "@seald-io/nedb": "^4.0.4",
     "dotenv": "^16.4.5",
     "fastify": "^5.8.5"
