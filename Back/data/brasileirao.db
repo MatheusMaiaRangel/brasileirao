@@ -1,4 +1,5 @@
-{"nome":"Palmeiras","estadio":"Nubank Parque","anoFundacao":"1914","_id":"Gtv82e3WVtKffWwf","createdAt":{"$$date":1781621767042},"updatedAt":{"$$date":1781621767042}}
+{"nome":"Palmeiras","estadio":"Nubank Parque","anoFundacao":"1914","_id":"Gtv82e3WVtKffWwf","createdAt":{"$$date":1781621767042},"updatedAt":{"$$date":1781632705400},"imagem":"/uploads/1781632705400-Palmeiras_3D.png"}
 {"nome":"Flamengo","estadio":"Maracanã","anoFundacao":"1895","_id":"SLa9Afxp0qJnWJK4","createdAt":{"$$date":1781492836791},"updatedAt":{"$$date":1781627202060},"imagem":"/uploads/1781627202057-Flamengo_3D.png"}
-{"nome":"São Paulo","estadio":"MorumBIS","anoFundacao":"1930","_id":"zsvTBTGBMksXFytL","createdAt":{"$$date":1781621738456},"updatedAt":{"$$date":1781621738456}}
+{"nome":"São Paulo","estadio":"MorumBIS","anoFundacao":"1930","_id":"zsvTBTGBMksXFytL","createdAt":{"$$date":1781621738456},"updatedAt":{"$$date":1781632795366},"imagem":"/uploads/1781632795365-São_Paulo_3D.png"}
 {"$$indexCreated":{"fieldName":"nome","unique":false,"sparse":false}}
+{"$$indexCreated":{"fieldName":"nome"}}

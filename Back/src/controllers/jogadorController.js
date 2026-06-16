@@ -1,7 +1,49 @@
 const db = require('../database');
+const fs = require('fs');
+const path = require('path');
 
-async function criarJogador(request, reply) {
-  const { nome, idade, posicao, numeroCamisa, timeId } = request.body;
+async function salvarImagemMultipart(request) {
+  if (!(request.isMultipart && request.isMultipart())) return null;
+
+  try {
+    let file = null;
+    try { file = await request.file(); } catch (e) { file = null; }
+
+    const uploadsDir = path.join(__dirname, '../../public/uploads');
+    await fs.promises.mkdir(uploadsDir, { recursive: true });
+
+    if (file && file.filename) {
+      const safeName = `${Date.now()}-${file.filename.replace(/\s+/g, '_')}`;
+      const dest = path.join(uploadsDir, safeName);
+      await new Promise((resolve, reject) => {
+        const ws = fs.createWriteStream(dest);
+        file.file.pipe(ws);
+        ws.on('finish', resolve);
+        ws.on('error', reject);
+      });
+      return `/uploads/${safeName}`;
+    }
+
+    const fileField = (request.body && request.body.imagem) || (request.body && request.body.image);
+    if (!fileField) return null;
+
+    const fileObj = Array.isArray(fileField) ? fileField[fileField.length - 1] : fileField;
+    if (!fileObj || (!fileObj.data && !fileObj.filename)) return null;
+
+    const buffer = fileObj.data;
+    const filename = fileObj.filename || `file-${Date.now()}`;
+    const safeName = `${Date.now()}-${filename.replace(/\s+/g, '_')}`;
+    const dest = path.join(uploadsDir, safeName);
+    await fs.promises.writeFile(dest, buffer);
+    return `/uploads/${safeName}`;
+  } catch (err) {
+    throw new Error('Erro ao salvar imagem');
+  }
+}
+
+async function criarJogador(request, reply) {  
+  const body = request.body || {};
+  const { nome, idade, posicao, numeroCamisa, timeId } = body;
 
   // precisa existir pelo menos um time cadastrado
   const existeAlgumTime = await db.times.findOneAsync({});
@@ -47,6 +89,13 @@ async function criarJogador(request, reply) {
     });
   }
 
+  let imagemPath = null;
+  try {
+    imagemPath = await salvarImagemMultipart(request);
+  } catch (err) {
+    return reply.code(500).send({ sucesso: false, erro: 'Erro ao salvar imagem' });
+  }
+
   const time = await db.times.findOneAsync({ _id: timeId });
   if (!time) {
     return reply.code(400).send({
@@ -60,6 +109,7 @@ async function criarJogador(request, reply) {
     idade: idade,
     posicao: posicao || null,
     numeroCamisa: numeroCamisa,
+    imagem: imagemPath,
     timeId,
   });
 
@@ -108,14 +158,18 @@ async function listarJogadoresPorTime(request, reply) {
 
 async function editarJogador(request, reply) {
   const { id } = request.params;
-  const { nome, idade, posicao, numeroCamisa, timeId } = request.body;
+  const body = request.body || {};
+  const { nome, idade, posicao, numeroCamisa, timeId } = body;
 
   const jogador = await db.jogadores.findOneAsync({ _id: id });
   if (!jogador) {
     return reply.code(404).send({ sucesso: false, erro: 'Jogador não encontrado' });
   }
 
-  if (!nome && !idade && !posicao && !numeroCamisa && !timeId) {
+  const hasImageUpload = request.isMultipart && request.isMultipart()
+    && ((request.body && request.body.imagem) || (request.body && request.body.image));
+
+  if (!nome && idade === undefined && !posicao && numeroCamisa === undefined && timeId === undefined && !hasImageUpload) {
     return reply.code(400).send({ sucesso: false, erro: 'Nenhum campo para atualizar' });
   }
 
@@ -142,6 +196,13 @@ async function editarJogador(request, reply) {
       return reply.code(400).send({ sucesso: false, erro: 'Time associado não encontrado' });
     }
     update.timeId = timeId;
+  }
+
+  try {
+    const novaImagemPath = await salvarImagemMultipart(request);
+    if (novaImagemPath) update.imagem = novaImagemPath;
+  } catch (err) {
+    return reply.code(500).send({ sucesso: false, erro: 'Erro ao salvar imagem' });
   }
 
   // garantir que o update seja persistido usando callback
