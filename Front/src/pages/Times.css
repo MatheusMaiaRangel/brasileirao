@@ -1,3 +1,4 @@
+/* ... estilos antigos da página Times ... */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Oswald:wght@500;600;700&display=swap');
 
 * { box-sizing: border-box; }
@@ -61,3 +62,14 @@
 .modal-close { display: flex; align-items: center; background: transparent; border: none; color: #6b7a70; cursor: pointer; }
 .modal-form { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .modal-actions { display: flex; gap: 8px; align-items: center; grid-column: 1 / -1; margin-top: 4px; }
+
+/* Estilos específicos do TimeDetalhes */
+.row-player { transition: border-color .15s; }
+.row-player:hover { border-color: #3fb950; }
+.del-btn { opacity: 0; transition: opacity .15s, color .15s; }
+.row-player:hover .del-btn { opacity: 1; }
+.del-btn:hover { color: #f3716b !important; }
+.edit-btn { opacity: 0; transition: opacity .15s, color .15s; }
+.row-player:hover .edit-btn { opacity: 1; }
+.edit-btn:hover { color: #ffd166 !important; }
+.back-btn:hover { color: #3fb950 !important; }
