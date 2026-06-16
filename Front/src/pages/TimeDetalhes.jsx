@@ -1,5 +1,7 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { FiPlus, FiTrash2, FiEdit2, FiX } from "react-icons/fi";
 import api from "../services/api";
+import "./Times.css";
 
 export default function TimeDetalhes({ time, onVoltar }) {
     const timeId = time.id || time._id;
@@ -8,21 +10,35 @@ export default function TimeDetalhes({ time, onVoltar }) {
     const [carregando, setCarregando] = useState(true);
     const [form, setForm] = useState({ nome: "", idade: "", posicao: "", numeroCamisa: "" });
     const [editando, setEditando] = useState(null);
+    const [message, setMessage] = useState(null);
+    const messageTimeoutRef = useRef(null);
 
-    async function carregarJogadores() {
+    function showMessage(text, type = "success") {
+        if (messageTimeoutRef.current) window.clearTimeout(messageTimeoutRef.current);
+        setMessage({ text, type });
+        messageTimeoutRef.current = window.setTimeout(() => setMessage(null), 3000);
+    }
+
+    const carregarJogadores = useCallback(async () => {
         setCarregando(true);
         try {
             const response = await api.get(`/times/${timeId}/jogadores`);
             setJogadores(response.data.dados || []);
         } catch (error) {
             console.error(error);
-            alert("Erro ao carregar jogadores");
+            showMessage("Erro ao carregar jogadores", "error");
         } finally {
             setCarregando(false);
         }
-    }
+    }, [timeId]);
 
-    useEffect(() => { carregarJogadores(); }, [timeId]);
+    useEffect(() => {
+        const timerId = window.setTimeout(() => {
+            void carregarJogadores();
+        }, 0);
+
+        return () => window.clearTimeout(timerId);
+    }, [carregarJogadores]);
 
     async function cadastrarJogador(e) {
         e.preventDefault();
@@ -35,11 +51,12 @@ export default function TimeDetalhes({ time, onVoltar }) {
                 timeId,
             });
             setForm({ nome: "", idade: "", posicao: "", numeroCamisa: "" });
-            carregarJogadores();
+            await carregarJogadores();
+            showMessage("Jogador adicionado com sucesso.");
         } catch (error) {
             console.error(error);
             const msg = error?.response?.data?.erro || "Erro ao cadastrar jogador";
-            alert(msg);
+            showMessage(msg, "error");
         }
     }
 
@@ -47,11 +64,12 @@ export default function TimeDetalhes({ time, onVoltar }) {
         if (!id) return;
         try {
             await api.delete(`/jogadores/${id}`);
-            carregarJogadores();
+            await carregarJogadores();
+            showMessage("Jogador removido com sucesso.");
         } catch (error) {
             console.error(error);
             const msg = error?.response?.data?.erro || "Erro ao remover jogador";
-            alert(msg);
+            showMessage(msg, "error");
         }
     }
 
@@ -75,43 +93,17 @@ export default function TimeDetalhes({ time, onVoltar }) {
                 numeroCamisa: String(editando.numeroCamisa),
             });
             setEditando(null);
-            carregarJogadores();
+            await carregarJogadores();
+            showMessage("Jogador atualizado com sucesso.");
         } catch (error) {
             console.error(error);
             const msg = error?.response?.data?.erro || "Erro ao atualizar jogador";
-            alert(msg);
+            showMessage(msg, "error");
         }
     }
 
     return (
         <div style={{ minHeight: "100vh", background: "#0e1410", color: "#eef1ee", fontFamily: "'Inter', system-ui, sans-serif" }}>
-            <style>{`
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Oswald:wght@500;600;700&display=swap');
-* { box-sizing: border-box; }
-.field {
-background: #161e19;
-border: 1px solid #2a352e;
-border-radius: 6px;
-color: #eef1ee;
-padding: 12px 14px;
-font-size: 14px;
-font-family: inherit;
-outline: none;
-width: 100%;
-transition: border-color .15s;
-}
-.field::placeholder { color: #6b7a70; }
-.field:focus { border-color: #3fb950; }
-.row-player { transition: border-color .15s; }
-.row-player:hover { border-color: #3fb950; }
-.del-btn { opacity: 0; transition: opacity .15s, color .15s; }
-.row-player:hover .del-btn { opacity: 1; }
-.del-btn:hover { color: #f3716b !important; }
-.edit-btn { opacity: 0; transition: opacity .15s, color .15s; }
-.row-player:hover .edit-btn { opacity: 1; }
-.edit-btn:hover { color: #ffd166 !important; }
-.back-btn:hover { color: #3fb950 !important; }
-`}</style>
 
             {/* Header */}
             <header style={{
@@ -141,6 +133,8 @@ transition: border-color .15s;
             </header>
 
             <div style={{ maxWidth: 1080, margin: "0 auto", padding: "32px 32px 64px" }}>
+
+                {message && <div className={`feedback ${message.type}`}>{message.text}</div>}
 
                 {/* Info do clube */}
                 <section style={{ marginBottom: 48 }}>
@@ -184,11 +178,14 @@ transition: border-color .15s;
                         <input className="field" type="number" placeholder="Nº" value={form.numeroCamisa}
                             onChange={(e) => setForm({ ...form, numeroCamisa: e.target.value })} required />
                         <button type="submit" style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 6,
                             background: "#3fb950", color: "#0e1410", border: "none",
                             borderRadius: 6, padding: "0 22px", fontWeight: 600, fontSize: 14,
                             cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap"
                         }}>
-                            Adicionar
+                            <FiPlus size={16} /> Adicionar
                         </button>
                     </form>
                 </section>
@@ -229,13 +226,17 @@ transition: border-color .15s;
                                     </div>
                                     <div style={{ display: "flex", gap: 8 }}>
                                         <button className="edit-btn" onClick={() => abrirEditar(jogador)} title="Editar jogador" style={{
+                                            display: "flex", alignItems: "center", gap: 6,
                                             background: "transparent", border: "none", color: "#6b7a70", cursor: "pointer", fontSize: 13, fontFamily: "inherit", letterSpacing: "0.05em"
                                         }}>
+                                            <FiEdit2 size={14} />
                                             Editar
                                         </button>
                                         <button className="del-btn" onClick={() => deletarJogador(jogador.id || jogador._id)} title="Remover jogador" style={{
+                                            display: "flex", alignItems: "center", gap: 6,
                                             background: "transparent", border: "none", color: "#6b7a70", cursor: "pointer", fontSize: 13, fontFamily: "inherit", letterSpacing: "0.05em"
                                         }}>
+                                            <FiTrash2 size={14} />
                                             Remover
                                         </button>
                                     </div>
@@ -251,7 +252,9 @@ transition: border-color .15s;
                         <div style={{ width: 520, background: "#0e1410", border: "1px solid #1f2a23", borderRadius: 8, padding: 20 }}>
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
                                 <div style={{ fontFamily: "Oswald, sans-serif", fontSize: 16, color: "#3fb950", fontWeight: 600 }}>Editar Jogador</div>
-                                <button onClick={fecharEditar} style={{ background: "transparent", border: "none", color: "#d4220a", cursor: "pointer" }}>X</button>
+                                <button onClick={fecharEditar} aria-label="Fechar" style={{ display: "flex", alignItems: "center", background: "transparent", border: "none", color: "#6b7a70", cursor: "pointer" }}>
+                                    <FiX size={18} />
+                                </button>
                             </div>
                             <form onSubmit={atualizarJogador} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                                 <input className="field" type="text" placeholder="Nome" value={editando.nome || ""}
