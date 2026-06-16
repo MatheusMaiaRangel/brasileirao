@@ -18,10 +18,10 @@ async function criarTime(request, reply) {
     });
   }
 
-  if (anoFundacao === undefined || anoFundacao === null || anoFundacao === '') {
+  if (anoFundacao === undefined || anoFundacao === null || anoFundacao === '' || isNaN(Number(anoFundacao)) || !Number.isInteger(Number(anoFundacao))) {
     return reply.code(400).send({
       sucesso: false,
-      erro: 'O campo "Ano de Fundação" é obrigatório',
+      erro: 'O campo "Ano de Fundação" é obrigatório e precisa ser um número',
     });
   }
 
