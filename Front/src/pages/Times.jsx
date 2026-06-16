@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../services/api";
 
-export default function App() {
+export default function App({ onSelecionarTime }) {
     const [times, setTimes] = useState([]);
     const [form, setForm] = useState({ nome: "", estadio: "", anoFundacao: "" });
     const [showEdit, setShowEdit] = useState(false);
@@ -164,17 +164,20 @@ transition: border-color .15s;
                     ) : (
                         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 12 }}>
                             {times.map((time, index) => (
-                                <div key={time.id || time._id || index} className="card-team" style={{
-                                    background: "#131b16", border: "1px solid #1f2a23", borderRadius: 8,
-                                    padding: 18, display: "flex", flexDirection: "column", gap: 10, position: "relative"
-                                }}>
+                                <div key={time.id || time._id || index} className="card-team"
+                                    onClick={() => onSelecionarTime && onSelecionarTime(time)}
+                                    title="Ver detalhes do clube"
+                                    style={{
+                                        background: "#131b16", border: "1px solid #1f2a23", borderRadius: 8,
+                                        padding: 18, display: "flex", flexDirection: "column", gap: 10, position: "relative", cursor: "pointer"
+                                    }}>
                                     <div style={{ position: "absolute", top: 14, right: 14, display: "flex" }}>
-                                        <button className="edit-btn" onClick={() => abrirEditarTime(time)} title="Editar clube" style={{
+                                        <button className="edit-btn" onClick={(e) => { e.stopPropagation(); abrirEditarTime(time); }} title="Editar clube" style={{
                                             background: "transparent", border: "none", color: "#6b7a70", cursor: "pointer", fontSize: 13, fontFamily: "inherit", letterSpacing: "0.05em"
                                         }}>
                                             Editar
                                         </button>
-                                        <button className="del-btn" onClick={() => deletarTime(time.id || time._id)} title="Remover clube" style={{
+                                        <button className="del-btn" onClick={(e) => { e.stopPropagation(); deletarTime(time.id || time._id); }} title="Remover clube" style={{
                                             background: "transparent", border: "none", color: "#6b7a70", cursor: "pointer", fontSize: 13,
                                             fontFamily: "inherit", letterSpacing: "0.05em", marginLeft: 8
                                         }}>

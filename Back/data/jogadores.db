@@ -4,3 +4,4 @@
 {"$$indexCreated":{"fieldName":"timeId","unique":false,"sparse":false}}
 {"$$indexCreated":{"fieldName":"nome"}}
 {"$$indexCreated":{"fieldName":"timeId"}}
+{"nome":"Arrascaeta","idade":"67","posicao":"GOL","numeroCamisa":"14","timeId":"SLa9Afxp0qJnWJK4","_id":"IEFYMrNLTWt07DbZ","createdAt":{"$$date":1781567924799},"updatedAt":{"$$date":1781567924799}}
