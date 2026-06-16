@@ -1,6 +1,28 @@
 require('dotenv').config();
 
 const fastify = require('fastify')({ logger: true });
+const path = require('path');
+
+// habilitar upload de arquivos (multipart) e servir arquivos estáticos em /uploads
+const multipartPlugin = require('@fastify/multipart');
+fastify.register(multipartPlugin.default || multipartPlugin, {
+  addToBody: true,
+  limits: { fileSize: 5 * 1024 * 1024 } // 5MB
+});
+
+// servir uploads através de rota custom sem depender de @fastify/static
+const fs = require('fs');
+fastify.get('/uploads/:file', async (request, reply) => {
+  const file = request.params.file;
+  const filePath = path.join(__dirname, 'public', 'uploads', file);
+  try {
+    await fs.promises.access(filePath, fs.constants.R_OK);
+  } catch (err) {
+    return reply.code(404).send({ sucesso: false, erro: 'Arquivo não encontrado' });
+  }
+  reply.type('application/octet-stream');
+  return reply.send(fs.createReadStream(filePath));
+});
 
 fastify.register(require('@fastify/cors'),{
   origin: '*',
