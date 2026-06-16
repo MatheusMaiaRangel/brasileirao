@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FiPlus, FiTrash2, FiEdit2, FiX } from "react-icons/fi";
+import Swal from "sweetalert2";
 import api from "../services/api";
 import "./Times.css";
 
@@ -62,6 +63,22 @@ export default function TimeDetalhes({ time, onVoltar }) {
 
     async function deletarJogador(id) {
         if (!id) return;
+
+        const result = await Swal.fire({
+            title: "Excluir jogador?",
+            text: "Essa ação não pode ser desfeita.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Sim, excluir",
+            cancelButtonText: "Cancelar",
+            confirmButtonColor: "#3fb950",
+            cancelButtonColor: "#6b7a70",
+            background: "#0e1410",
+            color: "#eef1ee",
+        });
+
+        if (!result.isConfirmed) return;
+
         try {
             await api.delete(`/jogadores/${id}`);
             await carregarJogadores();
@@ -229,15 +246,15 @@ export default function TimeDetalhes({ time, onVoltar }) {
                                             display: "flex", alignItems: "center", gap: 6,
                                             background: "transparent", border: "none", color: "#6b7a70", cursor: "pointer", fontSize: 13, fontFamily: "inherit", letterSpacing: "0.05em"
                                         }}>
-                                            <FiEdit2 size={14} />
-                                            Editar
+                                            <FiEdit2 size={18} />
+                                            
                                         </button>
                                         <button className="del-btn" onClick={() => deletarJogador(jogador.id || jogador._id)} title="Remover jogador" style={{
                                             display: "flex", alignItems: "center", gap: 6,
                                             background: "transparent", border: "none", color: "#6b7a70", cursor: "pointer", fontSize: 13, fontFamily: "inherit", letterSpacing: "0.05em"
                                         }}>
-                                            <FiTrash2 size={14} />
-                                            Remover
+                                            <FiTrash2 size={18} />
+                                           
                                         </button>
                                     </div>
                                 </div>

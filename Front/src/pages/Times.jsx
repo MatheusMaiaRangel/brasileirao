@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FiPlus, FiTrash2, FiEdit2, FiMapPin, FiCalendar, FiX } from "react-icons/fi";
+import Swal from "sweetalert2";
 import api from "../services/api";
 import { getTimeId } from "../utils/timeHelpers";
 import "./Times.css";
@@ -64,14 +65,14 @@ function TimeCard({ time, onSelecionar, onEdit, onDelete }) {
           onClick={(e) => { e.stopPropagation(); onEdit(time); }}
           title="Editar clube"
         >
-          <FiEdit2 size={16} />
+          <FiEdit2 size={18} />
         </button>
         <button
           className="icon-btn del-btn"
           onClick={(e) => { e.stopPropagation(); onDelete(getTimeId(time)); }}
           title="Remover clube"
         >
-          <FiTrash2 size={16} />
+          <FiTrash2 size={18} />
         </button>
       </div>
 
@@ -136,6 +137,22 @@ export default function Times({ onSelecionarTime }) {
   // ── DELETE: remove um time existente ──
   async function deletarTime(id) {
     if (!id) return showMessage("ID do time não encontrado", "error");
+
+    const result = await Swal.fire({
+      title: "Excluir clube?",
+      text: "Essa ação não pode ser desfeita.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Sim, excluir",
+      cancelButtonText: "Cancelar",
+      confirmButtonColor: "#3fb950",
+      cancelButtonColor: "#6b7a70",
+      background: "#0e1410",
+      color: "#eef1ee",
+    });
+
+    if (!result.isConfirmed) return;
+
     try {
       await api.delete(`/times/${id}`);
       await carregarTimes();
