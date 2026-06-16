@@ -1,5 +1,13 @@
+{"nome":"Grêmio","estadio":"Arena do Grêmio","anoFundacao":"1903","imagem":"/uploads/1781636272158-Grêmio_3D.png","_id":"5jTXHZ2aBFBWIYFV","createdAt":{"$$date":1781635715630},"updatedAt":{"$$date":1781636272159}}
+{"nome":"Corinthians","estadio":"Neo Química Arena","anoFundacao":"1910","imagem":"/uploads/1781635946723-Corinthians_3D.png","_id":"93xIYvvm4trfQJuK","createdAt":{"$$date":1781635534862},"updatedAt":{"$$date":1781635946724}}
+{"nome":"Vasco","estadio":"São Januário","anoFundacao":"1898","imagem":"/uploads/1781636228682-Vasco_da_Gama_3D.png","_id":"B2h2O393YXjRzK4X","createdAt":{"$$date":1781635625401},"updatedAt":{"$$date":1781636228683}}
+{"nome":"Cruzeiro","estadio":"Mineirão","anoFundacao":"1921","imagem":"/uploads/1781636387462-Cruzeiro_3D.png","_id":"CRyorHrHyELCvmNZ","createdAt":{"$$date":1781636328281},"updatedAt":{"$$date":1781636387462}}
 {"nome":"Palmeiras","estadio":"Nubank Parque","anoFundacao":"1914","_id":"Gtv82e3WVtKffWwf","createdAt":{"$$date":1781621767042},"updatedAt":{"$$date":1781632705400},"imagem":"/uploads/1781632705400-Palmeiras_3D.png"}
+{"nome":"Fluminense","estadio":"Maracanã","anoFundacao":"1902","imagem":null,"_id":"NFbtgvM6QoOfHEdz","createdAt":{"$$date":1781635600212},"updatedAt":{"$$date":1781635600212}}
 {"nome":"Flamengo","estadio":"Maracanã","anoFundacao":"1895","_id":"SLa9Afxp0qJnWJK4","createdAt":{"$$date":1781492836791},"updatedAt":{"$$date":1781627202060},"imagem":"/uploads/1781627202057-Flamengo_3D.png"}
+{"nome":"Botafogo","estadio":"Nilton Santos","anoFundacao":"1904","imagem":"/uploads/1781636055623-Botafogo_3D.png","_id":"VeDQMMkLR6ZHtnX2","createdAt":{"$$date":1781635653183},"updatedAt":{"$$date":1781636055623}}
+{"nome":"Atlético Mineiro","estadio":"Arena MRV","anoFundacao":"1908","imagem":"/uploads/1781636441059-Atlético_Mineiro_3D.png","_id":"YvWfvDkfI3sSTvp5","createdAt":{"$$date":1781636351079},"updatedAt":{"$$date":1781636441060}}
+{"nome":"Santos","estadio":"Vila Belmiro","anoFundacao":"1912","imagem":"/uploads/1781635888891-Santos_3D.png","_id":"jlMcluyxX3BIPcQC","createdAt":{"$$date":1781635493250},"updatedAt":{"$$date":1781635888893}}
+{"nome":"Internacional","estadio":"Beira-Rio","anoFundacao":"1909","imagem":"/uploads/1781636156762-Internacional_3D.png","_id":"siSzFr8vyHtJJENQ","createdAt":{"$$date":1781635751064},"updatedAt":{"$$date":1781636156763}}
 {"nome":"São Paulo","estadio":"MorumBIS","anoFundacao":"1930","_id":"zsvTBTGBMksXFytL","createdAt":{"$$date":1781621738456},"updatedAt":{"$$date":1781632795366},"imagem":"/uploads/1781632795365-São_Paulo_3D.png"}
 {"$$indexCreated":{"fieldName":"nome","unique":false,"sparse":false}}
-{"$$indexCreated":{"fieldName":"nome"}}
