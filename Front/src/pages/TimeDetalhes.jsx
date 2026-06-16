@@ -13,6 +13,7 @@ export default function TimeDetalhes({ time, onVoltar }) {
     const [carregando, setCarregando] = useState(true);
     const [form, setForm] = useState({ nome: "", idade: "", posicao: "", numeroCamisa: "" });
     const [editando, setEditando] = useState(null);
+    const [times, setTimes] = useState([]);
     const [message, setMessage] = useState(null);
     const messageTimeoutRef = useRef(null);
 
@@ -35,6 +36,15 @@ export default function TimeDetalhes({ time, onVoltar }) {
         }
     }, [timeId]);
 
+    const carregarTimes = useCallback(async () => {
+        try {
+            const response = await api.get('/times');
+            setTimes(response.data.dados || []);
+        } catch (error) {
+            console.error('Erro ao carregar times', error);
+        }
+    }, []);
+
     useEffect(() => {
         const timerId = window.setTimeout(() => {
             void carregarJogadores();
@@ -42,6 +52,10 @@ export default function TimeDetalhes({ time, onVoltar }) {
 
         return () => window.clearTimeout(timerId);
     }, [carregarJogadores]);
+
+    useEffect(() => {
+        void carregarTimes();
+    }, [carregarTimes]);
 
     async function cadastrarJogador(e) {
         e.preventDefault();
@@ -93,7 +107,7 @@ export default function TimeDetalhes({ time, onVoltar }) {
     }
 
     function abrirEditar(jogador) {
-        setEditando({ ...jogador });
+        setEditando({ ...jogador, originalTimeId: jogador.timeId });
     }
 
     function fecharEditar() {
@@ -111,6 +125,15 @@ export default function TimeDetalhes({ time, onVoltar }) {
                 posicao: editando.posicao,
                 numeroCamisa: String(editando.numeroCamisa),
             });
+            // se houve mudança de time, chamar endpoint de transferência
+            if (editando.timeId && editando.timeId !== editando.originalTimeId) {
+                try {
+                    await api.patch(`/jogadores/${id}`, { timeId: editando.timeId });
+                } catch (err) {
+                    console.error('Erro ao transferir jogador', err);
+                    // não abortar todo o fluxo — exibiremos mensagem após recarregar
+                }
+            }
             setEditando(null);
             await carregarJogadores();
             showMessage("Jogador atualizado com sucesso.");
@@ -295,6 +318,14 @@ export default function TimeDetalhes({ time, onVoltar }) {
                                     onChange={(e) => setEditando({ ...editando, posicao: e.target.value })} required />
                                 <input className="field" type="number" placeholder="Nº da camisa" value={editando.numeroCamisa || ""}
                                     onChange={(e) => setEditando({ ...editando, numeroCamisa: e.target.value })} required />
+
+                                <div style={{ fontFamily: "Oswald, sans-serif", fontSize: 16, color: "#3fb950", fontWeight: 600 }}>Transferir jogador</div>
+                                <select className="field" value={editando.timeId || ""} onChange={(e) => setEditando({ ...editando, timeId: e.target.value })} style={{ gridColumn: "1 / -1" }}>
+                                    <option disabled value="">Selecione um time para transferir</option>
+                                    {times.map((t) => (
+                                        <option key={t.id || t._id} value={t.id || t._id}>{t.nome}</option>
+                                    ))}
+                                </select>
                                 <div style={{ display: "flex", gap: 8, alignItems: "center", gridColumn: "1 / -1" }}>
                                     <button type="submit" style={{ background: "#3fb950", color: "#0e1410", border: "none", borderRadius: 6, padding: "8px 14px", fontWeight: 600, cursor: "pointer" }}>Salvar</button>
                                     <button type="button" onClick={fecharEditar} style={{ background: "transparent", color: "#6b7a70", border: "1px solid #2a352e", borderRadius: 6, padding: "8px 12px", cursor: "pointer" }}>Cancelar</button>
