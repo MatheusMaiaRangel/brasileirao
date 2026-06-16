@@ -2,10 +2,12 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { FiPlus, FiTrash2, FiEdit2, FiX } from "react-icons/fi";
 import Swal from "sweetalert2";
 import api from "../services/api";
+import { getTimeImageUrl } from "../utils/timeHelpers";
 import "./Times.css";
 
 export default function TimeDetalhes({ time, onVoltar }) {
     const timeId = time.id || time._id;
+    const imageUrl = getTimeImageUrl(time, api.defaults.baseURL);
 
     const [jogadores, setJogadores] = useState([]);
     const [carregando, setCarregando] = useState(true);
@@ -158,21 +160,32 @@ export default function TimeDetalhes({ time, onVoltar }) {
                     <div style={{ fontFamily: "Oswald, sans-serif", fontSize: 12, letterSpacing: "0.25em", color: "#6b7a70", textTransform: "uppercase", marginBottom: 12 }}>
                         Informações do Clube
                     </div>
-                    <div style={{
-                        display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12,
-                        background: "#131b16", border: "1px solid #1f2a23", borderRadius: 8, padding: 18
-                    }}>
-                        <div>
-                            <div style={{ fontSize: 11, letterSpacing: "0.15em", color: "#6b7a70", textTransform: "uppercase", marginBottom: 4 }}>Nome</div>
-                            <div style={{ fontFamily: "Oswald, sans-serif", fontSize: 18, fontWeight: 600 }}>{time.nome}</div>
+                    <div className="team-overview">
+                        <div className="team-hero">
+                            {imageUrl ? (
+                                <img src={imageUrl} alt={`Escudo do ${time.nome}`} className="team-hero-image" />
+                            ) : (
+                                <div className="team-hero-fallback" aria-label="Sem imagem do clube">
+                                    <span>{String(time.nome || "TC").trim().slice(0, 2).toUpperCase()}</span>
+                                </div>
+                            )}
                         </div>
-                        <div>
-                            <div style={{ fontSize: 11, letterSpacing: "0.15em", color: "#6b7a70", textTransform: "uppercase", marginBottom: 4 }}>Estádio</div>
-                            <div style={{ fontFamily: "Oswald, sans-serif", fontSize: 18, fontWeight: 600 }}>{time.estadio}</div>
-                        </div>
-                        <div>
-                            <div style={{ fontSize: 11, letterSpacing: "0.15em", color: "#6b7a70", textTransform: "uppercase", marginBottom: 4 }}>Fundação</div>
-                            <div style={{ fontFamily: "Oswald, sans-serif", fontSize: 18, fontWeight: 600, color: "#3fb950" }}>{time.anoFundacao}</div>
+                        <div style={{
+                            display: "grid", gridTemplateColumns: "1fr", gap: 14,
+                            background: "#131b16", border: "1px solid #1f2a23", borderRadius: 8, padding: 18
+                        }}>
+                            <div>
+                                <div style={{ fontSize: 11, letterSpacing: "0.15em", color: "#6b7a70", textTransform: "uppercase", marginBottom: 4 }}>Nome</div>
+                                <div style={{ fontFamily: "Oswald, sans-serif", fontSize: 18, fontWeight: 600 }}>{time.nome}</div>
+                            </div>
+                            <div>
+                                <div style={{ fontSize: 11, letterSpacing: "0.15em", color: "#6b7a70", textTransform: "uppercase", marginBottom: 4 }}>Estádio</div>
+                                <div style={{ fontFamily: "Oswald, sans-serif", fontSize: 18, fontWeight: 600 }}>{time.estadio}</div>
+                            </div>
+                            <div>
+                                <div style={{ fontSize: 11, letterSpacing: "0.15em", color: "#6b7a70", textTransform: "uppercase", marginBottom: 4 }}>Fundação</div>
+                                <div style={{ fontFamily: "Oswald, sans-serif", fontSize: 18, fontWeight: 600, color: "#3fb950" }}>{time.anoFundacao}</div>
+                            </div>
                         </div>
                     </div>
                 </section>
