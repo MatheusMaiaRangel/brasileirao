@@ -1,49 +1,15 @@
 const db = require('../database');
-const fs = require('fs');
-const path = require('path');
+const { lerRequisicaoComImagem } = require('../utils/multipart');
 
-async function salvarImagemMultipart(request) {
-  if (!(request.isMultipart && request.isMultipart())) return null;
-
+async function criarJogador(request, reply) {
+  let fields, imagemPath;
   try {
-    let file = null;
-    try { file = await request.file(); } catch (e) { file = null; }
-
-    const uploadsDir = path.join(__dirname, '../../public/uploads');
-    await fs.promises.mkdir(uploadsDir, { recursive: true });
-
-    if (file && file.filename) {
-      const safeName = `${Date.now()}-${file.filename.replace(/\s+/g, '_')}`;
-      const dest = path.join(uploadsDir, safeName);
-      await new Promise((resolve, reject) => {
-        const ws = fs.createWriteStream(dest);
-        file.file.pipe(ws);
-        ws.on('finish', resolve);
-        ws.on('error', reject);
-      });
-      return `/uploads/${safeName}`;
-    }
-
-    const fileField = (request.body && request.body.imagem) || (request.body && request.body.image);
-    if (!fileField) return null;
-
-    const fileObj = Array.isArray(fileField) ? fileField[fileField.length - 1] : fileField;
-    if (!fileObj || (!fileObj.data && !fileObj.filename)) return null;
-
-    const buffer = fileObj.data;
-    const filename = fileObj.filename || `file-${Date.now()}`;
-    const safeName = `${Date.now()}-${filename.replace(/\s+/g, '_')}`;
-    const dest = path.join(uploadsDir, safeName);
-    await fs.promises.writeFile(dest, buffer);
-    return `/uploads/${safeName}`;
+    ({ fields, imagemPath } = await lerRequisicaoComImagem(request));
   } catch (err) {
-    throw new Error('Erro ao salvar imagem');
+    return reply.code(500).send({ sucesso: false, erro: 'Erro ao salvar imagem' });
   }
-}
 
-async function criarJogador(request, reply) {  
-  const body = request.body || {};
-  const { nome, idade, posicao, numeroCamisa, timeId } = body;
+  const { nome, idade, posicao, numeroCamisa, timeId } = fields;
 
   // precisa existir pelo menos um time cadastrado
   const existeAlgumTime = await db.times.findOneAsync({});
@@ -87,13 +53,6 @@ async function criarJogador(request, reply) {
       sucesso: false,
       erro: 'O campo "timeId" é obrigatório',
     });
-  }
-
-  let imagemPath = null;
-  try {
-    imagemPath = await salvarImagemMultipart(request);
-  } catch (err) {
-    return reply.code(500).send({ sucesso: false, erro: 'Erro ao salvar imagem' });
   }
 
   const time = await db.times.findOneAsync({ _id: timeId });
@@ -211,18 +170,22 @@ async function transferenciaJogador(request, reply) {
 
 async function editarJogador(request, reply) {
   const { id } = request.params;
-  const body = request.body || {};
-  const { nome, idade, posicao, numeroCamisa} = body;
+
+  let fields, imagemPath;
+  try {
+    ({ fields, imagemPath } = await lerRequisicaoComImagem(request));
+  } catch (err) {
+    return reply.code(500).send({ sucesso: false, erro: 'Erro ao salvar imagem' });
+  }
+
+  const { nome, idade, posicao, numeroCamisa } = fields;
 
   const jogador = await db.jogadores.findOneAsync({ _id: id });
   if (!jogador) {
     return reply.code(404).send({ sucesso: false, erro: 'Jogador não encontrado' });
   }
 
-  const hasImageUpload = request.isMultipart && request.isMultipart()
-    && ((request.body && request.body.imagem) || (request.body && request.body.image));
-
-  if (!nome && idade === undefined && !posicao && numeroCamisa === undefined && !hasImageUpload) {
+  if (!nome && idade === undefined && !posicao && numeroCamisa === undefined && !imagemPath) {
     return reply.code(400).send({ sucesso: false, erro: 'Nenhum campo para atualizar' });
   }
 
@@ -233,7 +196,7 @@ async function editarJogador(request, reply) {
 
   if (idade !== undefined){
     update.idade = idade;
-  } 
+  }
 
   if (posicao && String(posicao).trim() !== ''){
     update.posicao = String(posicao).trim();
@@ -241,14 +204,10 @@ async function editarJogador(request, reply) {
 
   if (numeroCamisa !== undefined){
     update.numeroCamisa = numeroCamisa;
-  } 
-  
+  }
 
-  try {
-    const novaImagemPath = await salvarImagemMultipart(request);
-    if (novaImagemPath) update.imagem = novaImagemPath;
-  } catch (err) {
-    return reply.code(500).send({ sucesso: false, erro: 'Erro ao salvar imagem' });
+  if (imagemPath) {
+    update.imagem = imagemPath;
   }
 
   // garantir que o update seja persistido usando callback
