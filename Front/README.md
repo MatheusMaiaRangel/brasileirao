@@ -13,7 +13,7 @@ git clone https://github.com/MatheusMaiaRangel/Trabalho-Fastify-React/
 Acesse a pasta do frontend:
 
 ```bash
-cd frontend
+cd Front
 ```
 
 Instale as dependências:
