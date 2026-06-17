@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { FiPlus, FiTrash2, FiEdit2, FiMapPin, FiCalendar, FiX } from "react-icons/fi";
+import { FiPlus, FiTrash2, FiEdit2, FiMapPin, FiCalendar, FiX, FiImage } from "react-icons/fi";
 import Swal from "sweetalert2";
-import api from "../services/api";
-import { getTimeId } from "../utils/timeHelpers";
+import api, { comImagem } from "../services/api";
+import { getTimeId, getTimeImageUrl } from "../utils/timeHelpers";
 import "./Times.css";
 
 const INITIAL_FORM = { nome: "", estadio: "", anoFundacao: "" };
@@ -19,7 +19,22 @@ function getErrorMsg(error, fallback) {
 }
 
 // Campos do formulário (reutilizados no "Novo Registro" e no modal de edição)
-function TimeFields({ values, onChange, idPrefix }) {
+function TimeFields({ values, onChange, arquivo, onArquivo, imagemAtualUrl, idPrefix }) {
+  const isEdit = idPrefix === "edit";
+
+  const fileLabel = (
+    <label className={`file-label${arquivo ? " has-file" : ""}`} title="Escudo do clube (opcional)">
+      <FiImage size={15} />
+      {arquivo ? arquivo.name : isEdit ? "Trocar escudo" : "Escudo (opcional)"}
+      <input
+        type="file"
+        accept="image/*"
+        hidden
+        onChange={(e) => onArquivo(e.target.files[0] || null)}
+      />
+    </label>
+  );
+
   return (
     <>
       <input
@@ -29,7 +44,7 @@ function TimeFields({ values, onChange, idPrefix }) {
         value={values.nome || ""}
         onChange={(e) => onChange({ ...values, nome: e.target.value })}
         required
-        style={idPrefix === "edit" ? { gridColumn: "1 / -1" } : undefined}
+        style={isEdit ? { gridColumn: "1 / -1" } : undefined}
       />
       <input
         className="field"
@@ -47,12 +62,28 @@ function TimeFields({ values, onChange, idPrefix }) {
         onChange={(e) => onChange({ ...values, anoFundacao: e.target.value })}
         required
       />
+      {isEdit ? (
+        <div className="upload-row">
+          {(arquivo || imagemAtualUrl) && (
+            <img
+              className="img-preview"
+              src={arquivo ? URL.createObjectURL(arquivo) : imagemAtualUrl}
+              alt="Escudo do clube"
+            />
+          )}
+          {fileLabel}
+        </div>
+      ) : (
+        fileLabel
+      )}
     </>
   );
 }
 
 // Card individual de cada clube — clicável para selecionar o time (onSelecionarTime)
 function TimeCard({ time, onSelecionar, onEdit, onDelete }) {
+  const logoUrl = getTimeImageUrl(time, api.defaults.baseURL);
+
   return (
     <div
       className="card-team"
@@ -76,6 +107,8 @@ function TimeCard({ time, onSelecionar, onEdit, onDelete }) {
         </button>
       </div>
 
+      {logoUrl && <img className="card-logo" src={logoUrl} alt={`Escudo do ${time.nome}`} />}
+
       <div className="card-title">{time.nome}</div>
 
       <div className="card-row">
@@ -94,9 +127,21 @@ function TimeCard({ time, onSelecionar, onEdit, onDelete }) {
 export default function Times({ onSelecionarTime }) {
   const [times, setTimes] = useState([]);
   const [form, setForm] = useState(INITIAL_FORM);
-  const [message, setMessage] = useState(null);       // feedback de sucesso/erro
-  const [editingTime, setEditingTime] = useState(null); // clube sendo editado (abre o modal)
+  const [arquivo, setArquivo] = useState(null);          // escudo selecionado no "Novo Registro"
+  const [message, setMessage] = useState(null);          // feedback de sucesso/erro
+  const [editingTime, setEditingTime] = useState(null);  // clube sendo editado (abre o modal)
+  const [arquivoEdicao, setArquivoEdicao] = useState(null); // novo escudo no modal de edição
   const messageTimeoutRef = useRef(null);
+
+  // Abre/fecha o modal de edição, sempre limpando o arquivo selecionado
+  function abrirEdicao(time) {
+    setEditingTime(time);
+    setArquivoEdicao(null);
+  }
+  function fecharEdicao() {
+    setEditingTime(null);
+    setArquivoEdicao(null);
+  }
 
   // Mostra uma mensagem de feedback por 3 segundos
   function showMessage(text, type = "success") {
@@ -124,8 +169,10 @@ export default function Times({ onSelecionarTime }) {
   async function cadastrarTime(event) {
     event.preventDefault();
     try {
-      await api.post("/times", form);
+      await api.post("/times", comImagem(form, arquivo));
       setForm(INITIAL_FORM);
+      setArquivo(null);
+      event.target.reset();
       await carregarTimes();
       showMessage("Time adicionado com sucesso.");
     } catch (error) {
@@ -170,8 +217,13 @@ export default function Times({ onSelecionarTime }) {
     if (!id) return showMessage("ID do time não encontrado para atualização", "error");
 
     try {
-      await api.put(`/times/${id}`, editingTime);
-      setEditingTime(null);
+      const dados = {
+        nome: editingTime.nome,
+        estadio: editingTime.estadio,
+        anoFundacao: editingTime.anoFundacao,
+      };
+      await api.put(`/times/${id}`, comImagem(dados, arquivoEdicao));
+      fecharEdicao();
       await carregarTimes();
       showMessage("Time atualizado com sucesso.");
     } catch (error) {
@@ -207,7 +259,13 @@ export default function Times({ onSelecionarTime }) {
         {/*  Formulário: novo registro  */}
         <div className="section-label">Novo Registro</div>
         <form onSubmit={cadastrarTime} className="form panel">
-          <TimeFields values={form} onChange={setForm} idPrefix="new" />
+          <TimeFields
+            values={form}
+            onChange={setForm}
+            arquivo={arquivo}
+            onArquivo={setArquivo}
+            idPrefix="new"
+          />
           <button type="submit" className="btn btn-primary">
             <FiPlus size={16} /> Adicionar
           </button>
@@ -224,7 +282,7 @@ export default function Times({ onSelecionarTime }) {
                 key={getTimeId(time) ?? i}
                 time={time}
                 onSelecionar={onSelecionarTime}
-                onEdit={setEditingTime}
+                onEdit={abrirEdicao}
                 onDelete={deletarTime}
               />
             ))}
@@ -238,15 +296,22 @@ export default function Times({ onSelecionarTime }) {
           <div className="modal">
             <div className="modal-header">
               Editar Clube
-              <button className="modal-close" onClick={() => setEditingTime(null)} aria-label="Fechar">
+              <button className="modal-close" onClick={fecharEdicao} aria-label="Fechar">
                 <FiX size={18} />
               </button>
             </div>
             <form onSubmit={atualizarTime} className="modal-form">
-              <TimeFields values={editingTime} onChange={setEditingTime} idPrefix="edit" />
+              <TimeFields
+                values={editingTime}
+                onChange={setEditingTime}
+                arquivo={arquivoEdicao}
+                onArquivo={setArquivoEdicao}
+                imagemAtualUrl={getTimeImageUrl(editingTime, api.defaults.baseURL)}
+                idPrefix="edit"
+              />
               <div className="modal-actions">
                 <button type="submit" className="btn btn-primary modal-btn">Salvar</button>
-                <button type="button" className="btn btn-ghost" onClick={() => setEditingTime(null)}>Cancelar</button>
+                <button type="button" className="btn btn-ghost" onClick={fecharEdicao}>Cancelar</button>
               </div>
             </form>
           </div>

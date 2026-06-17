@@ -20,10 +20,24 @@
 
 /* Formulário (novo registro) */
 .panel { background: #131b16; border: 1px solid #1f2a23; border-radius: 8px; padding: 18px; }
-.form { display: grid; grid-template-columns: 2fr 2fr 1fr auto; gap: 12px; margin-bottom: 48px; }
+.form { display: grid; grid-template-columns: 2fr 2fr 1fr 1.4fr auto; gap: 12px; margin-bottom: 48px; align-items: center; }
 .field { width: 100%; padding: 12px 14px; border: 1px solid #2a352e; border-radius: 6px; background: #161e19; color: #eef1ee; font-family: inherit; font-size: 14px; outline: none; transition: border-color .15s; }
 .field::placeholder { color: #6b7a70; }
 .field:focus { border-color: #3fb950; }
+
+/* Upload de imagem (escudo / foto) */
+.file-label { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 12px 14px; border: 1px dashed #2a352e; border-radius: 6px; background: #161e19; color: #6b7a70; font-size: 13px; cursor: pointer; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; transition: border-color .15s, color .15s; }
+.file-label:hover { border-color: #3fb950; color: #eef1ee; }
+.file-label.has-file { color: #eef1ee; border-style: solid; }
+.img-preview { width: 48px; height: 48px; object-fit: cover; border-radius: 8px; border: 1px solid #2a352e; background: #0e1410; flex-shrink: 0; }
+.upload-row { grid-column: 1 / -1; display: flex; align-items: center; gap: 12px; }
+.upload-row .file-label { flex: 1; }
+
+/* Escudo exibido no card de clube */
+.card-logo { width: 56px; height: 56px; object-fit: contain; border-radius: 8px; border: 1px solid #2a352e; background: #0e1410; align-self: flex-start; }
+
+/* Foto do jogador na linha do elenco */
+.player-avatar { width: 44px; height: 44px; object-fit: cover; border-radius: 50%; border: 1px solid #2a352e; background: #0e1410; flex-shrink: 0; }
 
 /* Botões */
 .btn { display: flex; align-items: center; justify-content: center; gap: 6px; border: none; border-radius: 6px; font-weight: 600; font-size: 14px; cursor: pointer; font-family: inherit; white-space: nowrap; }
