@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { FiPlus, FiTrash2, FiEdit2, FiX } from "react-icons/fi";
+import { FiPlus, FiTrash2, FiEdit2, FiX, FiImage } from "react-icons/fi";
 import Swal from "sweetalert2";
-import api from "../services/api";
+import api, { comImagem } from "../services/api";
 import { getTimeImageUrl } from "../utils/timeHelpers";
 import "./Times.css";
 
@@ -12,7 +12,9 @@ export default function TimeDetalhes({ time, onVoltar }) {
     const [jogadores, setJogadores] = useState([]);
     const [carregando, setCarregando] = useState(true);
     const [form, setForm] = useState({ nome: "", idade: "", posicao: "", numeroCamisa: "" });
+    const [arquivoJogador, setArquivoJogador] = useState(null);
     const [editando, setEditando] = useState(null);
+    const [arquivoEdicao, setArquivoEdicao] = useState(null);
     const [times, setTimes] = useState([]);
     const [message, setMessage] = useState(null);
     const messageTimeoutRef = useRef(null);
@@ -60,14 +62,17 @@ export default function TimeDetalhes({ time, onVoltar }) {
     async function cadastrarJogador(e) {
         e.preventDefault();
         try {
-            await api.post("/jogadores", {
+            const dados = {
                 nome: form.nome,
                 idade: String(form.idade),
                 posicao: form.posicao,
                 numeroCamisa: String(form.numeroCamisa),
                 timeId,
-            });
+            };
+            await api.post("/jogadores", comImagem(dados, arquivoJogador));
             setForm({ nome: "", idade: "", posicao: "", numeroCamisa: "" });
+            setArquivoJogador(null);
+            e.target.reset();
             await carregarJogadores();
             showMessage("Jogador adicionado com sucesso.");
         } catch (error) {
@@ -108,10 +113,12 @@ export default function TimeDetalhes({ time, onVoltar }) {
 
     function abrirEditar(jogador) {
         setEditando({ ...jogador, originalTimeId: jogador.timeId });
+        setArquivoEdicao(null);
     }
 
     function fecharEditar() {
         setEditando(null);
+        setArquivoEdicao(null);
     }
 
     async function atualizarJogador(e) {
@@ -119,12 +126,13 @@ export default function TimeDetalhes({ time, onVoltar }) {
         if (!editando) return;
         const id = editando.id || editando._id;
         try {
-            await api.put(`/jogadores/${id}`, {
+            const dados = {
                 nome: editando.nome,
                 idade: String(editando.idade),
                 posicao: editando.posicao,
                 numeroCamisa: String(editando.numeroCamisa),
-            });
+            };
+            await api.put(`/jogadores/${id}`, comImagem(dados, arquivoEdicao));
             // se houve mudança de time, chamar endpoint de transferência
             if (editando.timeId && editando.timeId !== editando.originalTimeId) {
                 try {
@@ -219,7 +227,7 @@ export default function TimeDetalhes({ time, onVoltar }) {
                         Novo Jogador
                     </div>
                     <form onSubmit={cadastrarJogador} style={{
-                        display: "grid", gridTemplateColumns: "2fr 1fr 1.5fr 1fr auto", gap: 12,
+                        display: "grid", gridTemplateColumns: "2fr 1fr 1.5fr 1fr 1.4fr auto", gap: 12, alignItems: "center",
                         background: "#131b16", border: "1px solid #1f2a23", borderRadius: 8, padding: 18
                     }}>
                         <input className="field" type="text" placeholder="Nome" value={form.nome}
@@ -230,6 +238,12 @@ export default function TimeDetalhes({ time, onVoltar }) {
                             onChange={(e) => setForm({ ...form, posicao: e.target.value })} required />
                         <input className="field" type="number" placeholder="Nº" value={form.numeroCamisa}
                             onChange={(e) => setForm({ ...form, numeroCamisa: e.target.value })} required />
+                        <label className={`file-label${arquivoJogador ? " has-file" : ""}`} title="Foto do jogador (opcional)">
+                            <FiImage size={15} />
+                            {arquivoJogador ? arquivoJogador.name : "Foto (opcional)"}
+                            <input type="file" accept="image/*" hidden
+                                onChange={(e) => setArquivoJogador(e.target.files[0] || null)} />
+                        </label>
                         <button type="submit" style={{
                             display: "flex",
                             alignItems: "center",
@@ -265,6 +279,11 @@ export default function TimeDetalhes({ time, onVoltar }) {
                                     background: "#131b16", border: "1px solid #1f2a23", borderRadius: 8,
                                     padding: "14px 18px", display: "flex", alignItems: "center", gap: 16
                                 }}>
+                                    {getTimeImageUrl(jogador, api.defaults.baseURL) && (
+                                        <img className="player-avatar"
+                                            src={getTimeImageUrl(jogador, api.defaults.baseURL)}
+                                            alt={jogador.nome} />
+                                    )}
                                     <div style={{
                                         fontFamily: "Oswald, sans-serif", fontSize: 22, fontWeight: 700, color: "#3fb950",
                                         minWidth: 40, textAlign: "center"
@@ -318,6 +337,20 @@ export default function TimeDetalhes({ time, onVoltar }) {
                                     onChange={(e) => setEditando({ ...editando, posicao: e.target.value })} required />
                                 <input className="field" type="number" placeholder="Nº da camisa" value={editando.numeroCamisa || ""}
                                     onChange={(e) => setEditando({ ...editando, numeroCamisa: e.target.value })} required />
+
+                                <div className="upload-row">
+                                    {(arquivoEdicao || getTimeImageUrl(editando, api.defaults.baseURL)) && (
+                                        <img className="img-preview" style={{ borderRadius: "50%" }}
+                                            src={arquivoEdicao ? URL.createObjectURL(arquivoEdicao) : getTimeImageUrl(editando, api.defaults.baseURL)}
+                                            alt="Foto do jogador" />
+                                    )}
+                                    <label className={`file-label${arquivoEdicao ? " has-file" : ""}`} title="Trocar foto">
+                                        <FiImage size={15} />
+                                        {arquivoEdicao ? arquivoEdicao.name : "Trocar foto (opcional)"}
+                                        <input type="file" accept="image/*" hidden
+                                            onChange={(e) => setArquivoEdicao(e.target.files[0] || null)} />
+                                    </label>
+                                </div>
 
                                 <div style={{ fontFamily: "Oswald, sans-serif", fontSize: 16, color: "#3fb950", fontWeight: 600 }}>Transferir jogador</div>
                                 <select className="field" value={editando.timeId || ""} onChange={(e) => setEditando({ ...editando, timeId: e.target.value })} style={{ gridColumn: "1 / -1" }}>
