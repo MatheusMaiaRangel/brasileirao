@@ -2,14 +2,22 @@
 
 ## Site do Brasileirão
 
-Este repositório foi criado com a finalidade de realizar um trabalho da máteria "Programação WEB" na Fatec. Instruções de inicialização e instalação de dependências do projeto estão localizadas em cada pasta 
+O Sistema de Gerenciamento do Brasileirão é uma aplicação web desenvolvida como atividade da disciplina de Programação Web da Fatec.
 
+O site permite realizar operações CRUD (Create, Read, Update e Delete) sobre clubes do Campeonato Brasileiro e seus jogadores, possibilitando o gerenciamento completo dessas informações por meio de cadastro, consulta, edição e remoção de registros.
 
 ## 🧰 Tecnologias utilizadas
 - <img align="center" alt="HTML" height="30" width="40" src="https://raw.githubusercontent.com/devicons/devicon/master/icons/html5/html5-original.svg">: Estrutura das páginas e marcação do conteúdo
 - <img align="center" alt="CSS" height="30" width="40" src="https://raw.githubusercontent.com/devicons/devicon/master/icons/css3/css3-original.svg">: Estilização e responsividade da interface
 - <img align="center" alt="React" height="30" width="40" src="https://raw.githubusercontent.com/devicons/devicon/master/icons/react/react-original.svg">: Criação da interface do usuário (UI) utilizando componentes dinâmicos
 - <img align="center" alt="Node" height="30" width="40" src="https://raw.githubusercontent.com/devicons/devicon/master/icons/nodejs/nodejs-original.svg">: Lógica de backend e conexão com banco de dados (NeDB)
+
+## 📂 Estrutura do Projeto
+
+Cada diretório possui um README próprio contendo as instruções de instalação e execução.
+
+- **front/** → Aplicação React
+- **back/** → API Node.js + NeDB
 
 <h2>👥 Créditos</h2>
 <table>
