@@ -4,6 +4,7 @@ import Swal from "sweetalert2";
 import api, { comImagem } from "../services/api";
 import { getTimeId, getTimeImageUrl } from "../utils/timeHelpers";
 import "./Times.css";
+import logoBrasileirao from "../assets/Logo_br.png";
 
 const INITIAL_FORM = { nome: "", estadio: "", anoFundacao: "" };
 const EMPTY_MESSAGE = "Nenhum clube cadastrado ainda. Use o formulário acima para adicionar o primeiro.";
@@ -237,17 +238,35 @@ export default function Times({ onSelecionarTime }) {
 
       {/*  Cabeçalho  */}
       <header className="header">
-        <div>
-          <div className="eyebrow">Club Manager</div>
-          <h1 className="title">Cadastro de Times</h1>
-        </div>
-        <div className="count">
-          <div className="count-num">{String(times.length).padStart(2, "0")}</div>
-          <div className="count-label">
-            {times.length === 1 ? "clube registrado" : "clubes registrados"}
-          </div>
-        </div>
-      </header>
+  <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+    <img
+      src={logoBrasileirao}
+      alt="Brasileirão"
+      style={{
+        width: "100px",
+        height: "100px",
+        objectFit: "contain",
+      }}
+    />
+
+    <div>
+      <div className="eyebrow">Central do Brasileirão</div>
+      <h1 className="title">Cadastro de Times</h1>
+    </div>
+  </div>
+
+  <div className="count">
+    <div className="count-num">
+      {String(times.length).padStart(2, "0")}
+    </div>
+
+    <div className="count-label">
+      {times.length === 1
+        ? "clube registrado"
+        : "clubes registrados"}
+    </div>
+  </div>
+</header>
 
       <div className="container">
 
