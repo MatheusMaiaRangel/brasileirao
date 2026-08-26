@@ -1,4 +1,6 @@
-<img width="3840" height="2160" alt="Image" src="https://github.com/user-attachments/assets/b6234fcb-9f93-4ab1-8df9-709c2e44b8ef" />
+<a href="https://brasileiraofatec.vercel.app/">
+  <img width="3840" height="2160" alt="Image" src="https://github.com/user-attachments/assets/b6234fcb-9f93-4ab1-8df9-709c2e44b8ef" />
+</a>
 
 ## Site do Brasileirão
 
@@ -6,7 +8,7 @@ O Sistema de Gerenciamento do Brasileirão é uma aplicação web desenvolvida c
 
 O site permite realizar operações CRUD (Create, Read, Update e Delete) sobre clubes do Campeonato Brasileiro e seus jogadores, possibilitando o gerenciamento completo dessas informações por meio de cadastro, consulta, edição e remoção de registros.
 
-Você pode acessar nosso projeto em:  https://brasileiraofatec.vercel.app/
+Você pode acessar nosso projeto em:  https://brasileiraofatec.vercel.app
 
 ## 🧰 Tecnologias utilizadas
 - <img align="center" alt="HTML" height="30" width="40" src="https://raw.githubusercontent.com/devicons/devicon/master/icons/html5/html5-original.svg">: Estrutura das páginas e marcação do conteúdo
