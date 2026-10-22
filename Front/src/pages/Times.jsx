@@ -163,7 +163,11 @@ export default function Times({ onSelecionarTime }) {
   }, []);
 
   useEffect(() => {
-    void carregarTimes();
+    const timerId = window.setTimeout(() => {
+      void carregarTimes();
+    }, 0);
+
+    return () => window.clearTimeout(timerId);
   }, [carregarTimes]);
 
   // ── CREATE: cadastra um novo time ──

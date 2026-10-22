@@ -56,7 +56,11 @@ export default function TimeDetalhes({ time, onVoltar }) {
     }, [carregarJogadores]);
 
     useEffect(() => {
-        void carregarTimes();
+        const timerId = window.setTimeout(() => {
+            void carregarTimes();
+        }, 0);
+
+        return () => window.clearTimeout(timerId);
     }, [carregarTimes]);
 
     async function cadastrarJogador(e) {
