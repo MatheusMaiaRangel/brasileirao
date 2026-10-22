@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "node --watch server.js"
   },
   "keywords": [],
   "author": "",
@@ -16,9 +16,6 @@
     "@fastify/multipart": "^10.0.0",
     "@seald-io/nedb": "^4.0.4",
     "dotenv": "^16.4.5",
-    "fastify": "^5.8.5"
-  },
-  "devDependencies": {
-    "nodemon": "^3.1.4"
+    "fastify": "^5.12.5"
   }
 }
