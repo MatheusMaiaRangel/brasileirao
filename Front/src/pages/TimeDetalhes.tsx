@@ -1,25 +1,31 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import type { FormEvent } from "react";
+import axios from "axios";
 import { FiPlus, FiTrash2, FiEdit2, FiX, FiImage } from "react-icons/fi";
 import Swal from "sweetalert2";
 import api, { comImagem } from "../services/api";
 import { getTimeImageUrl } from "../utils/timeHelpers";
 import "./Times.css";
+import type { ApiResponse, Jogador, Time } from "../types";
 
-export default function TimeDetalhes({ time, onVoltar }) {
+type Feedback = { text: string; type: "success" | "error" };
+type JogadorEdicao = Jogador & { originalTimeId: string };
+
+export default function TimeDetalhes({ time, onVoltar }: { time: Time; onVoltar: () => void }) {
     const timeId = time.id || time._id;
     const imageUrl = getTimeImageUrl(time, api.defaults.baseURL);
 
-    const [jogadores, setJogadores] = useState([]);
+    const [jogadores, setJogadores] = useState<Jogador[]>([]);
     const [carregando, setCarregando] = useState(true);
     const [form, setForm] = useState({ nome: "", idade: "", posicao: "", numeroCamisa: "" });
-    const [arquivoJogador, setArquivoJogador] = useState(null);
-    const [editando, setEditando] = useState(null);
-    const [arquivoEdicao, setArquivoEdicao] = useState(null);
-    const [times, setTimes] = useState([]);
-    const [message, setMessage] = useState(null);
-    const messageTimeoutRef = useRef(null);
+    const [arquivoJogador, setArquivoJogador] = useState<File | null>(null);
+    const [editando, setEditando] = useState<JogadorEdicao | null>(null);
+    const [arquivoEdicao, setArquivoEdicao] = useState<File | null>(null);
+    const [times, setTimes] = useState<Time[]>([]);
+    const [message, setMessage] = useState<Feedback | null>(null);
+    const messageTimeoutRef = useRef<number | null>(null);
 
-    function showMessage(text, type = "success") {
+    function showMessage(text: string, type: Feedback["type"] = "success") {
         if (messageTimeoutRef.current) window.clearTimeout(messageTimeoutRef.current);
         setMessage({ text, type });
         messageTimeoutRef.current = window.setTimeout(() => setMessage(null), 3000);
@@ -28,7 +34,7 @@ export default function TimeDetalhes({ time, onVoltar }) {
     const carregarJogadores = useCallback(async () => {
         setCarregando(true);
         try {
-            const response = await api.get(`/times/${timeId}/jogadores`);
+            const response = await api.get<ApiResponse<Jogador[]>>(`/times/${timeId}/jogadores`);
             setJogadores(response.data.dados || []);
         } catch (error) {
             console.error(error);
@@ -40,7 +46,7 @@ export default function TimeDetalhes({ time, onVoltar }) {
 
     const carregarTimes = useCallback(async () => {
         try {
-            const response = await api.get('/times');
+            const response = await api.get<ApiResponse<Time[]>>('/times');
             setTimes(response.data.dados || []);
         } catch (error) {
             console.error('Erro ao carregar times', error);
@@ -63,8 +69,9 @@ export default function TimeDetalhes({ time, onVoltar }) {
         return () => window.clearTimeout(timerId);
     }, [carregarTimes]);
 
-    async function cadastrarJogador(e) {
+    async function cadastrarJogador(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
+        const formElement = e.currentTarget;
         try {
             const dados = {
                 nome: form.nome,
@@ -76,17 +83,17 @@ export default function TimeDetalhes({ time, onVoltar }) {
             await api.post("/jogadores", comImagem(dados, arquivoJogador));
             setForm({ nome: "", idade: "", posicao: "", numeroCamisa: "" });
             setArquivoJogador(null);
-            e.target.reset();
+            formElement.reset();
             await carregarJogadores();
             showMessage("Jogador adicionado com sucesso.");
         } catch (error) {
             console.error(error);
-            const msg = error?.response?.data?.erro || "Erro ao cadastrar jogador";
+            const msg = axios.isAxiosError<{ erro?: string }>(error) ? error.response?.data?.erro || "Erro ao cadastrar jogador" : "Erro ao cadastrar jogador";
             showMessage(msg, "error");
         }
     }
 
-    async function deletarJogador(id) {
+    async function deletarJogador(id: string | undefined) {
         if (!id) return;
 
         const result = await Swal.fire({
@@ -110,12 +117,12 @@ export default function TimeDetalhes({ time, onVoltar }) {
             showMessage("Jogador removido com sucesso.");
         } catch (error) {
             console.error(error);
-            const msg = error?.response?.data?.erro || "Erro ao remover jogador";
+            const msg = axios.isAxiosError<{ erro?: string }>(error) ? error.response?.data?.erro || "Erro ao remover jogador" : "Erro ao remover jogador";
             showMessage(msg, "error");
         }
     }
 
-    function abrirEditar(jogador) {
+    function abrirEditar(jogador: Jogador) {
         setEditando({ ...jogador, originalTimeId: jogador.timeId });
         setArquivoEdicao(null);
     }
@@ -125,7 +132,7 @@ export default function TimeDetalhes({ time, onVoltar }) {
         setArquivoEdicao(null);
     }
 
-    async function atualizarJogador(e) {
+    async function atualizarJogador(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
         if (!editando) return;
         const id = editando.id || editando._id;
@@ -151,7 +158,7 @@ export default function TimeDetalhes({ time, onVoltar }) {
             showMessage("Jogador atualizado com sucesso.");
         } catch (error) {
             console.error(error);
-            const msg = error?.response?.data?.erro || "Erro ao atualizar jogador";
+            const msg = axios.isAxiosError<{ erro?: string }>(error) ? error.response?.data?.erro || "Erro ao atualizar jogador" : "Erro ao atualizar jogador";
             showMessage(msg, "error");
         }
     }
@@ -246,7 +253,7 @@ export default function TimeDetalhes({ time, onVoltar }) {
                             <FiImage size={15} />
                             {arquivoJogador ? arquivoJogador.name : "Foto (opcional)"}
                             <input type="file" accept="image/*" hidden
-                                onChange={(e) => setArquivoJogador(e.target.files[0] || null)} />
+                                onChange={(e) => setArquivoJogador(e.target.files?.[0] || null)} />
                         </label>
                         <button type="submit" style={{
                             display: "flex",
@@ -352,7 +359,7 @@ export default function TimeDetalhes({ time, onVoltar }) {
                                         <FiImage size={15} />
                                         {arquivoEdicao ? arquivoEdicao.name : "Trocar foto (opcional)"}
                                         <input type="file" accept="image/*" hidden
-                                            onChange={(e) => setArquivoEdicao(e.target.files[0] || null)} />
+                                            onChange={(e) => setArquivoEdicao(e.target.files?.[0] || null)} />
                                     </label>
                                 </div>
 

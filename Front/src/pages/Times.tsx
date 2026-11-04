@@ -1,10 +1,24 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import type { FormEvent } from "react";
+import axios from "axios";
 import { FiPlus, FiTrash2, FiEdit2, FiMapPin, FiCalendar, FiX, FiImage } from "react-icons/fi";
 import Swal from "sweetalert2";
 import api, { comImagem } from "../services/api";
 import { getTimeId, getTimeImageUrl } from "../utils/timeHelpers";
 import "./Times.css";
 import logoBrasileirao from "../assets/Logo_br.png";
+import type { ApiResponse, Time } from "../types";
+
+type TimeFormValues = Pick<Time, "nome" | "estadio" | "anoFundacao">;
+type Feedback = { text: string; type: "success" | "error" };
+type TimeFieldsProps<T extends TimeFormValues> = {
+  values: T;
+  onChange: (value: T) => void;
+  arquivo: File | null;
+  onArquivo: (arquivo: File | null) => void;
+  imagemAtualUrl?: string;
+  idPrefix: "new" | "edit";
+};
 
 const INITIAL_FORM = { nome: "", estadio: "", anoFundacao: "" };
 const EMPTY_MESSAGE = "Nenhum clube cadastrado ainda. Use o formulário acima para adicionar o primeiro.";
@@ -12,15 +26,15 @@ const EMPTY_MESSAGE = "Nenhum clube cadastrado ainda. Use o formulário acima pa
 
 
 // Extrai a mensagem de erro vinda da API, ou usa um texto padrão
-function getErrorMsg(error, fallback) {
-  return error?.response?.data?.erro
-    || error?.response?.data?.mensagem
-    || error?.message
-    || fallback;
+function getErrorMsg(error: unknown, fallback: string): string {
+  if (axios.isAxiosError<{ erro?: string; mensagem?: string }>(error)) {
+    return error.response?.data?.erro || error.response?.data?.mensagem || error.message || fallback;
+  }
+  return error instanceof Error ? error.message : fallback;
 }
 
 // Campos do formulário (reutilizados no "Novo Registro" e no modal de edição)
-function TimeFields({ values, onChange, arquivo, onArquivo, imagemAtualUrl, idPrefix }) {
+function TimeFields<T extends TimeFormValues>({ values, onChange, arquivo, onArquivo, imagemAtualUrl, idPrefix }: TimeFieldsProps<T>) {
   const isEdit = idPrefix === "edit";
 
   const fileLabel = (
@@ -31,7 +45,7 @@ function TimeFields({ values, onChange, arquivo, onArquivo, imagemAtualUrl, idPr
         type="file"
         accept="image/*"
         hidden
-        onChange={(e) => onArquivo(e.target.files[0] || null)}
+        onChange={(e) => onArquivo(e.target.files?.[0] || null)}
       />
     </label>
   );
@@ -82,13 +96,18 @@ function TimeFields({ values, onChange, arquivo, onArquivo, imagemAtualUrl, idPr
 }
 
 // Card individual de cada clube — clicável para selecionar o time (onSelecionarTime)
-function TimeCard({ time, onSelecionar, onEdit, onDelete }) {
+function TimeCard({ time, onSelecionar, onEdit, onDelete }: {
+  time: Time;
+  onSelecionar: (time: Time) => void;
+  onEdit: (time: Time) => void;
+  onDelete: (id: string | null) => void;
+}) {
   const logoUrl = getTimeImageUrl(time, api.defaults.baseURL);
 
   return (
     <div
       className="card-team"
-      onClick={() => onSelecionar && onSelecionar(time)}
+      onClick={() => onSelecionar(time)}
       title="Ver detalhes do clube"
     >
       <div className="card-actions">
@@ -125,17 +144,17 @@ function TimeCard({ time, onSelecionar, onEdit, onDelete }) {
   );
 }
 
-export default function Times({ onSelecionarTime }) {
-  const [times, setTimes] = useState([]);
+export default function Times({ onSelecionarTime }: { onSelecionarTime: (time: Time) => void }) {
+  const [times, setTimes] = useState<Time[]>([]);
   const [form, setForm] = useState(INITIAL_FORM);
-  const [arquivo, setArquivo] = useState(null);          // escudo selecionado no "Novo Registro"
-  const [message, setMessage] = useState(null);          // feedback de sucesso/erro
-  const [editingTime, setEditingTime] = useState(null);  // clube sendo editado (abre o modal)
-  const [arquivoEdicao, setArquivoEdicao] = useState(null); // novo escudo no modal de edição
-  const messageTimeoutRef = useRef(null);
+  const [arquivo, setArquivo] = useState<File | null>(null);          // escudo selecionado no "Novo Registro"
+  const [message, setMessage] = useState<Feedback | null>(null);          // feedback de sucesso/erro
+  const [editingTime, setEditingTime] = useState<Time | null>(null);  // clube sendo editado (abre o modal)
+  const [arquivoEdicao, setArquivoEdicao] = useState<File | null>(null); // novo escudo no modal de edição
+  const messageTimeoutRef = useRef<number | null>(null);
 
   // Abre/fecha o modal de edição, sempre limpando o arquivo selecionado
-  function abrirEdicao(time) {
+  function abrirEdicao(time: Time) {
     setEditingTime(time);
     setArquivoEdicao(null);
   }
@@ -145,7 +164,7 @@ export default function Times({ onSelecionarTime }) {
   }
 
   // Mostra uma mensagem de feedback por 3 segundos
-  function showMessage(text, type = "success") {
+  function showMessage(text: string, type: Feedback["type"] = "success") {
     if (messageTimeoutRef.current) window.clearTimeout(messageTimeoutRef.current);
     setMessage({ text, type });
     messageTimeoutRef.current = window.setTimeout(() => setMessage(null), 3000);
@@ -154,8 +173,8 @@ export default function Times({ onSelecionarTime }) {
   // ── READ: carrega a lista de times da API ──
   const carregarTimes = useCallback(async () => {
     try {
-      const response = await api.get("/times");
-      setTimes(response.data.dados || response.data || []);
+      const response = await api.get<ApiResponse<Time[]>>("/times");
+      setTimes(response.data.dados || []);
     } catch (error) {
       console.error(error);
       showMessage("Erro ao carregar times", "error");
@@ -171,13 +190,14 @@ export default function Times({ onSelecionarTime }) {
   }, [carregarTimes]);
 
   // ── CREATE: cadastra um novo time ──
-  async function cadastrarTime(event) {
+  async function cadastrarTime(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const formElement = event.currentTarget;
     try {
       await api.post("/times", comImagem(form, arquivo));
       setForm(INITIAL_FORM);
       setArquivo(null);
-      event.target.reset();
+      formElement.reset();
       await carregarTimes();
       showMessage("Time adicionado com sucesso.");
     } catch (error) {
@@ -187,7 +207,7 @@ export default function Times({ onSelecionarTime }) {
   }
 
   // ── DELETE: remove um time existente ──
-  async function deletarTime(id) {
+  async function deletarTime(id: string | null) {
     if (!id) return showMessage("ID do time não encontrado", "error");
 
     const result = await Swal.fire({
@@ -216,8 +236,9 @@ export default function Times({ onSelecionarTime }) {
   }
 
   // ── UPDATE: salva as alterações do time em edição ──
-  async function atualizarTime(event) {
+  async function atualizarTime(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!editingTime) return;
     const id = getTimeId(editingTime);
     if (!id) return showMessage("ID do time não encontrado para atualização", "error");
 

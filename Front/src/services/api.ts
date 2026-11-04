@@ -6,12 +6,12 @@ const api = axios.create({
 
 // Monta o corpo de um POST/PUT: se houver arquivo, envia como multipart
 // (FormData) com a imagem no campo "imagem"; senão devolve o próprio objeto (JSON).
-export function comImagem(dados, arquivo) {
+export function comImagem(dados: Record<string, string | number | undefined>, arquivo: File | null): FormData | typeof dados {
   if (!arquivo) return dados;
 
   const formData = new FormData();
   Object.entries(dados).forEach(([chave, valor]) => {
-    if (valor !== undefined && valor !== null) formData.append(chave, valor);
+    if (valor !== undefined && valor !== null) formData.append(chave, String(valor));
   });
   formData.append("imagem", arquivo);
   return formData;
