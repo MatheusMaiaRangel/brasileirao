@@ -9,7 +9,7 @@ test('fluxo de clubes e jogadores pela API', async () => {
   process.env.DATA_DIR = dataDir;
   process.env.UPLOADS_DIR = path.join(dataDir, 'uploads');
 
-  const { buildServer } = await import('../server.js');
+  const { buildServer } = await import('../src/createServer.js');
 
   const app = buildServer();
   try {
