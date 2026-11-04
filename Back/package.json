@@ -2,10 +2,13 @@
   "name": "back",
   "version": "1.0.0",
   "description": "API REST com Fastify e NeDB do Brasileirão",
-  "main": "server.js",
+  "main": "dist/server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node --watch server.js"
+    "start": "node dist/server.js",
+    "dev": "tsx watch server.ts",
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test test/*.test.ts"
   },
   "keywords": [],
   "author": "",
@@ -17,5 +20,10 @@
     "@seald-io/nedb": "^4.0.4",
     "dotenv": "^16.4.5",
     "fastify": "^5.12.5"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
   }
 }

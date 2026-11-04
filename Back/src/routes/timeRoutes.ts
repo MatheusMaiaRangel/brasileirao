@@ -1,15 +1,16 @@
-const {
+import type { FastifyInstance } from 'fastify';
+import {
   criarTime,
   deletarTime,
   buscarTime,
   listarTimes,
   editarTime
-} = require('../controllers/timeController');
-const {
+} from '../controllers/timeController';
+import {
   listarJogadoresPorTime,
-} = require('../controllers/jogadorController');
+} from '../controllers/jogadorController';
 
-async function timeRoutes(fastify) {
+export default async function timeRoutes(fastify: FastifyInstance) {
   fastify.post('/times', criarTime);
   fastify.get('/times/:id', buscarTime);
   fastify.get('/times/:timeId/jogadores', listarJogadoresPorTime);
@@ -17,5 +18,3 @@ async function timeRoutes(fastify) {
   fastify.get('/times', listarTimes);
   fastify.put('/times/:id', editarTime);
 }
-
-module.exports = timeRoutes;

@@ -1,8 +1,10 @@
-const db = require('../database');
-const { lerRequisicaoComImagem } = require('../utils/multipart');
+import type { FastifyReply, FastifyRequest } from 'fastify';
+import db from '../database';
+import { lerRequisicaoComImagem } from '../utils/multipart';
+import type { IdParams, JogadorRecord, TimeIdParams } from '../types';
 
-async function criarJogador(request, reply) {
-  let fields, imagemPath;
+export async function criarJogador(request: FastifyRequest, reply: FastifyReply) {
+  let fields: Record<string, string>, imagemPath: string | null;
   try {
     ({ fields, imagemPath } = await lerRequisicaoComImagem(request));
   } catch (err) {
@@ -75,7 +77,7 @@ async function criarJogador(request, reply) {
   return reply.code(201).send({ sucesso: true, dados: jogador });
 }
 
-async function deletarJogador(request, reply) {
+export async function deletarJogador(request: FastifyRequest<{ Params: IdParams }>, reply: FastifyReply) {
   const { id } = request.params;
 
   const numRemoved = await db.jogadores.removeAsync({ _id: id }, {});
@@ -90,12 +92,12 @@ async function deletarJogador(request, reply) {
   return reply.code(204).send();
 }
 
-async function listarJogadores(request, reply) {
+export async function listarJogadores(_request: FastifyRequest, reply: FastifyReply) {
   const jogadores = await db.jogadores.findAsync({});
   return reply.send({ sucesso: true, dados: jogadores });
 }
 
-async function listarJogadoresPorTime(request, reply) {
+export async function listarJogadoresPorTime(request: FastifyRequest<{ Params: TimeIdParams }>, reply: FastifyReply) {
   const { timeId } = request.params;
 
   const time = await db.times.findOneAsync({ _id: timeId });
@@ -115,12 +117,12 @@ async function listarJogadoresPorTime(request, reply) {
   });
 }
 
-async function transferenciaJogador(request, reply) {
+export async function transferenciaJogador(request: FastifyRequest<{ Params: IdParams; Body: { timeId?: string } }>, reply: FastifyReply) {
   const { id } = request.params;
   const body = request.body || {};
   const { timeId } = body;
 
-  const update = {};
+  const update: Partial<JogadorRecord> = {};
 
   const jogador = await db.jogadores.findOneAsync({ _id: id });
   if (!jogador) {
@@ -143,8 +145,8 @@ async function transferenciaJogador(request, reply) {
 
   // garantir que o update seja persistido usando callback
   try {
-    await new Promise((resolve, reject) => {
-      db.jogadores.update({ _id: id }, { $set: update }, {}, (err /*, numAffected */) => {
+    await new Promise<void>((resolve, reject) => {
+      db.jogadores.update({ _id: id }, { $set: update }, {}, (err) => {
         if (err) return reject(err);
         resolve();
       });
@@ -157,7 +159,7 @@ async function transferenciaJogador(request, reply) {
 
   // compacta o datafile usando a instância em execução (aguarda conclusão)
   try {
-    await new Promise((resolve) => db.jogadores.compactDatafile(resolve));
+    await new Promise<void>((resolve) => db.jogadores.compactDatafile(() => resolve()));
   } catch (err) {
     // não bloquear a resposta se a compactação falhar
   }
@@ -168,10 +170,10 @@ async function transferenciaJogador(request, reply) {
 
 }
 
-async function editarJogador(request, reply) {
+export async function editarJogador(request: FastifyRequest<{ Params: IdParams }>, reply: FastifyReply) {
   const { id } = request.params;
 
-  let fields, imagemPath;
+  let fields: Record<string, string>, imagemPath: string | null;
   try {
     ({ fields, imagemPath } = await lerRequisicaoComImagem(request));
   } catch (err) {
@@ -189,7 +191,7 @@ async function editarJogador(request, reply) {
     return reply.code(400).send({ sucesso: false, erro: 'Nenhum campo para atualizar' });
   }
 
-  const update = {};
+  const update: Partial<JogadorRecord> = {};
   if (nome && String(nome).trim() !== ''){
     update.nome = String(nome).trim();
   }
@@ -212,8 +214,8 @@ async function editarJogador(request, reply) {
 
   // garantir que o update seja persistido usando callback
   try {
-    await new Promise((resolve, reject) => {
-      db.jogadores.update({ _id: id }, { $set: update }, {}, (err /*, numAffected */) => {
+    await new Promise<void>((resolve, reject) => {
+      db.jogadores.update({ _id: id }, { $set: update }, {}, (err) => {
         if (err) return reject(err);
         resolve();
       });
@@ -226,19 +228,10 @@ async function editarJogador(request, reply) {
 
   // compacta o datafile usando a instância em execução (aguarda conclusão)
   try {
-    await new Promise((resolve) => db.jogadores.compactDatafile(resolve));
+    await new Promise<void>((resolve) => db.jogadores.compactDatafile(() => resolve()));
   } catch (err) {
     // não bloquear a resposta se a compactação falhar
   }
 
   return reply.send({ sucesso: true, dados: jogadorAtualizado });
 }
-
-module.exports = {
-  criarJogador,
-  editarJogador,
-  deletarJogador,
-  listarJogadores,
-  listarJogadoresPorTime,
-  transferenciaJogador
-};

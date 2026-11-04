@@ -1,8 +1,10 @@
-const db = require('../database');
-const { lerRequisicaoComImagem } = require('../utils/multipart');
+import type { FastifyReply, FastifyRequest } from 'fastify';
+import db from '../database';
+import { lerRequisicaoComImagem } from '../utils/multipart';
+import type { IdParams, TimeRecord } from '../types';
 
-async function criarTime(request, reply) {
-  let fields, imagemPath;
+export async function criarTime(request: FastifyRequest, reply: FastifyReply) {
+  let fields: Record<string, string>, imagemPath: string | null;
   try {
     ({ fields, imagemPath } = await lerRequisicaoComImagem(request));
   } catch (err) {
@@ -35,7 +37,7 @@ async function criarTime(request, reply) {
   return reply.code(201).send({ sucesso: true, dados: time });
 }
 
-async function deletarTime(request, reply) {
+export async function deletarTime(request: FastifyRequest<{ Params: IdParams }>, reply: FastifyReply) {
   const { id } = request.params;
 
   const jogadorVinculado = await db.jogadores.findOneAsync({ timeId: id });
@@ -58,10 +60,10 @@ async function deletarTime(request, reply) {
   return reply.code(204).send();
 }
 
-async function editarTime(request, reply) {
+export async function editarTime(request: FastifyRequest<{ Params: IdParams }>, reply: FastifyReply) {
   const { id } = request.params;
 
-  let fields, imagemPath;
+  let fields: Record<string, string>, imagemPath: string | null;
   try {
     ({ fields, imagemPath } = await lerRequisicaoComImagem(request));
   } catch (err) {
@@ -79,7 +81,7 @@ async function editarTime(request, reply) {
     return reply.code(400).send({ sucesso: false, erro: 'Nenhum campo para atualizar' });
   }
 
-  const update = {};
+  const update: Partial<TimeRecord> = {};
   if (nome && String(nome).trim() !== '') {
     update.nome = String(nome).trim();
   }
@@ -97,8 +99,8 @@ async function editarTime(request, reply) {
 
   // garantir que o update seja persistido usando callback
   try {
-    await new Promise((resolve, reject) => {
-      db.times.update({ _id: id }, { $set: update }, {}, (err /*, numAffected */) => {
+    await new Promise<void>((resolve, reject) => {
+      db.times.update({ _id: id }, { $set: update }, {}, (err) => {
         if (err) return reject(err);
         resolve();
       });
@@ -111,7 +113,7 @@ async function editarTime(request, reply) {
 
   // compacta o datafile usando a instância em execução (aguarda conclusão)
   try {
-    await new Promise((resolve) => db.times.compactDatafile(resolve));
+    await new Promise<void>((resolve) => db.times.compactDatafile(() => resolve()));
   } catch (err) {
     // não bloquear a resposta se a compactação falhar
   }
@@ -122,7 +124,7 @@ async function editarTime(request, reply) {
 
 
 
-async function buscarTime(request, reply) {
+export async function buscarTime(request: FastifyRequest<{ Params: IdParams }>, reply: FastifyReply) {
   const { id } = request.params;
 
   const time = await db.times.findOneAsync({ _id: id });
@@ -137,15 +139,7 @@ async function buscarTime(request, reply) {
   return reply.send({ sucesso: true, dados: time });
 }
 
-async function listarTimes(request, reply) {
+export async function listarTimes(_request: FastifyRequest, reply: FastifyReply) {
     const times = await db.times.findAsync({});
     return reply.send({ sucesso: true, dados: times });
   }
-
-module.exports = {
-  criarTime,
-  deletarTime,
-  buscarTime,
-  listarTimes,
-  editarTime
-};

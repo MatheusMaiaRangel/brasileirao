@@ -1,8 +1,9 @@
-const fs = require('fs');
-const path = require('path');
-const { pipeline } = require('stream/promises');
+import fs from 'node:fs';
+import path from 'node:path';
+import { pipeline } from 'node:stream/promises';
+import type { FastifyRequest } from 'fastify';
 
-const UPLOADS_DIR = path.join(__dirname, '../../public/uploads');
+const UPLOADS_DIR = path.resolve(process.env.UPLOADS_DIR || path.join(process.cwd(), 'public/uploads'));
 
 /**
  * Lê uma requisição que pode conter imagem.
@@ -15,15 +16,18 @@ const UPLOADS_DIR = path.join(__dirname, '../../public/uploads');
  * Isso permite que os controllers tratem JSON e multipart da mesma forma,
  * lendo sempre de `fields`.
  */
-async function lerRequisicaoComImagem(request) {
+export async function lerRequisicaoComImagem(request: FastifyRequest): Promise<{
+  fields: Record<string, string>;
+  imagemPath: string | null;
+}> {
   if (!(request.isMultipart && request.isMultipart())) {
-    return { fields: request.body || {}, imagemPath: null };
+    return { fields: (request.body || {}) as Record<string, string>, imagemPath: null };
   }
 
   await fs.promises.mkdir(UPLOADS_DIR, { recursive: true });
 
-  const fields = {};
-  let imagemPath = null;
+  const fields: Record<string, string> = {};
+  let imagemPath: string | null = null;
 
   for await (const part of request.parts()) {
     if (part.type === 'file') {
@@ -37,11 +41,9 @@ async function lerRequisicaoComImagem(request) {
       await pipeline(part.file, fs.createWriteStream(dest));
       imagemPath = `/uploads/${safeName}`;
     } else {
-      fields[part.fieldname] = part.value;
+      fields[part.fieldname] = String(part.value);
     }
   }
 
   return { fields, imagemPath };
 }
-
-module.exports = { lerRequisicaoComImagem };

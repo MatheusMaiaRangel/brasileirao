@@ -1,17 +1,16 @@
-const {
+import type { FastifyInstance } from 'fastify';
+import {
   criarJogador,
   editarJogador,
   deletarJogador,
   transferenciaJogador,
   listarJogadores,
-} = require('../controllers/jogadorController');
+} from '../controllers/jogadorController';
 
-async function jogadorRoutes(fastify) {
+export default async function jogadorRoutes(fastify: FastifyInstance) {
   fastify.post('/jogadores', criarJogador);
   fastify.put('/jogadores/:id', editarJogador);
   fastify.delete('/jogadores/:id', deletarJogador);
   fastify.get('/jogadores', listarJogadores);
   fastify.patch('/jogadores/:id', transferenciaJogador);
 }
-
-module.exports = jogadorRoutes;
