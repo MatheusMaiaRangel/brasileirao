@@ -7,7 +7,7 @@ Interface do sistema desenvolvida com React.
 Clone o repositório: 
 
 ```bash
-git clone https://github.com/MatheusMaiaRangel/Trabalho-Fastify-React/
+git clone https://github.com/MatheusMaiaRangel/brasileirao.git
 ```
 
 Acesse a pasta do frontend:
@@ -31,3 +31,13 @@ npm run dev
 ```
 
 Após a inicialização, acesse a URL exibida no terminal.
+
+## Verificação e build
+
+```bash
+npm run typecheck
+npm run lint
+npm run build
+```
+
+O frontend usa TypeScript (`.ts` e `.tsx`).

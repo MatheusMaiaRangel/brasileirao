@@ -7,7 +7,7 @@ API responsável pelo gerenciamento dos dados de clubes e jogadores.
 Clone o repositório: 
 
 ```bash
-git clone https://github.com/MatheusMaiaRangel/Trabalho-Fastify-React/
+git clone https://github.com/MatheusMaiaRangel/brasileirao.git
 ```
 
 Acesse a pasta do backend:
@@ -30,4 +30,15 @@ Inicie o servidor de desenvolvimento:
 npm run dev
 ```
 
-Após a inicialização, acesse a URL exibida no terminal da pasta `Front`.
+A API fica disponível em `http://localhost:3000`.
+
+## Verificação, testes e produção
+
+```bash
+npm run typecheck
+npm test
+npm run build
+npm start
+```
+
+O backend usa TypeScript. `npm run dev` executa `server.ts`; `npm start` executa o JavaScript compilado em `dist/`.

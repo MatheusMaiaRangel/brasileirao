@@ -15,6 +15,7 @@ Você pode acessar nosso projeto em:  https://brasileiraofatec.vercel.app
 - <img align="center" alt="CSS" height="30" width="40" src="https://raw.githubusercontent.com/devicons/devicon/master/icons/css3/css3-original.svg">: Estilização e responsividade da interface
 - <img align="center" alt="React" height="30" width="40" src="https://raw.githubusercontent.com/devicons/devicon/master/icons/react/react-original.svg">: Criação da interface do usuário (UI) utilizando componentes dinâmicos
 - <img align="center" alt="Node" height="30" width="40" src="https://raw.githubusercontent.com/devicons/devicon/master/icons/nodejs/nodejs-original.svg">: Lógica de backend e conexão com banco de dados (NeDB)
+- **TypeScript**: código da interface e da API com verificação de tipos
 
 ## 📂 Estrutura do Projeto
 
