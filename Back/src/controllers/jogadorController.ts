@@ -3,6 +3,12 @@ import db from '../database';
 import { lerRequisicaoComImagem } from '../utils/multipart';
 import type { IdParams, JogadorRecord, TimeIdParams } from '../types';
 
+function inteiroPositivo(valor: unknown): boolean {
+  const texto = String(valor);
+  const numero = Number(texto);
+  return /^\d+$/.test(texto) && Number.isSafeInteger(numero) && numero > 0;
+}
+
 export async function criarJogador(request: FastifyRequest, reply: FastifyReply) {
   let fields: Record<string, string>, imagemPath: string | null;
   try {
@@ -49,10 +55,10 @@ export async function criarJogador(request: FastifyRequest, reply: FastifyReply)
       erro: 'O campo "numeroCamisa" é obrigatório',
     });
   }
-  if (!/^\d+$/.test(String(idade)) || !Number.isSafeInteger(Number(idade)) || Number(idade) <= 0) {
+  if (!inteiroPositivo(idade)) {
     return reply.code(400).send({ sucesso: false, erro: 'A idade deve ser um inteiro positivo' });
   }
-  if (!/^\d+$/.test(String(numeroCamisa)) || !Number.isSafeInteger(Number(numeroCamisa)) || Number(numeroCamisa) <= 0) {
+  if (!inteiroPositivo(numeroCamisa)) {
     return reply.code(400).send({ sucesso: false, erro: 'O número da camisa deve ser um inteiro positivo' });
   }
 
@@ -197,10 +203,10 @@ export async function editarJogador(request: FastifyRequest<{ Params: IdParams }
     return reply.code(400).send({ sucesso: false, erro: 'Nenhum campo para atualizar' });
   }
 
-  if (idade !== undefined && (!/^\d+$/.test(String(idade)) || !Number.isSafeInteger(Number(idade)) || Number(idade) <= 0)) {
+  if (idade !== undefined && !inteiroPositivo(idade)) {
     return reply.code(400).send({ sucesso: false, erro: 'A idade deve ser um inteiro positivo' });
   }
-  if (numeroCamisa !== undefined && (!/^\d+$/.test(String(numeroCamisa)) || !Number.isSafeInteger(Number(numeroCamisa)) || Number(numeroCamisa) <= 0)) {
+  if (numeroCamisa !== undefined && !inteiroPositivo(numeroCamisa)) {
     return reply.code(400).send({ sucesso: false, erro: 'O número da camisa deve ser um inteiro positivo' });
   }
 
