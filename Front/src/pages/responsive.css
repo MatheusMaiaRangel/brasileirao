@@ -1,0 +1,59 @@
+@media (max-width: 900px) {
+  .form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .player-form {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .container,
+  .header {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .details-container {
+    padding: 24px 16px 48px !important;
+  }
+
+  .form,
+  .modal-form,
+  .player-form,
+  .player-edit-form {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .form .btn-primary,
+  .player-form button[type='submit'] {
+    min-height: 44px;
+  }
+
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .count {
+    text-align: left;
+  }
+
+  .row-player {
+    flex-wrap: wrap;
+  }
+
+  .player-edit-modal {
+    width: calc(100vw - 32px) !important;
+    max-height: calc(100vh - 32px);
+    overflow-y: auto;
+  }
+}
+
+@media (hover: none) {
+  .card-actions .icon-btn,
+  .row-player .edit-btn,
+  .row-player .del-btn {
+    opacity: 1;
+  }
+}

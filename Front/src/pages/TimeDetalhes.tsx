@@ -6,6 +6,7 @@ import Swal from "sweetalert2";
 import api, { comImagem } from "../services/api";
 import { getTimeImageUrl } from "../utils/timeHelpers";
 import "./Times.css";
+import "./responsive.css";
 import type { ApiResponse, Jogador, Time } from "../types";
 
 type Feedback = { text: string; type: "success" | "error" };
@@ -150,7 +151,11 @@ export default function TimeDetalhes({ time, onVoltar }: { time: Time; onVoltar:
                     await api.patch(`/jogadores/${id}`, { timeId: editando.timeId });
                 } catch (err) {
                     console.error('Erro ao transferir jogador', err);
-                    // não abortar todo o fluxo — exibiremos mensagem após recarregar
+                    setEditando(null);
+                    await carregarJogadores();
+                    const msg = axios.isAxiosError<{ erro?: string }>(err) ? err.response?.data?.erro || "Erro ao transferir jogador" : "Erro ao transferir jogador";
+                    showMessage(`Dados atualizados, mas a transferência falhou: ${msg}`, "error");
+                    return;
                 }
             }
             setEditando(null);
@@ -193,7 +198,7 @@ export default function TimeDetalhes({ time, onVoltar }: { time: Time; onVoltar:
                 </div>
             </header>
 
-            <div style={{ maxWidth: 1080, margin: "0 auto", padding: "32px 32px 64px" }}>
+            <div className="details-container" style={{ maxWidth: 1080, margin: "0 auto", padding: "32px 32px 64px" }}>
 
                 {message && <div className={`feedback ${message.type}`}>{message.text}</div>}
 
@@ -237,7 +242,7 @@ export default function TimeDetalhes({ time, onVoltar }: { time: Time; onVoltar:
                     <div style={{ fontFamily: "Oswald, sans-serif", fontSize: 12, letterSpacing: "0.25em", color: "#6b7a70", textTransform: "uppercase", marginBottom: 12 }}>
                         Novo Jogador
                     </div>
-                    <form onSubmit={cadastrarJogador} style={{
+                    <form className="player-form" onSubmit={cadastrarJogador} style={{
                         display: "grid", gridTemplateColumns: "2fr 1fr 1.5fr 1fr 1.4fr auto", gap: 12, alignItems: "center",
                         background: "#131b16", border: "1px solid #1f2a23", borderRadius: 8, padding: 18
                     }}>
@@ -332,14 +337,14 @@ export default function TimeDetalhes({ time, onVoltar }: { time: Time; onVoltar:
                 {/* Modal editar jogador */}
                 {editando && (
                     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 60 }}>
-                        <div style={{ width: 520, background: "#0e1410", border: "1px solid #1f2a23", borderRadius: 8, padding: 20 }}>
+                        <div className="player-edit-modal" style={{ width: 520, background: "#0e1410", border: "1px solid #1f2a23", borderRadius: 8, padding: 20 }}>
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
                                 <div style={{ fontFamily: "Oswald, sans-serif", fontSize: 16, color: "#3fb950", fontWeight: 600 }}>Editar Jogador</div>
                                 <button onClick={fecharEditar} aria-label="Fechar" style={{ display: "flex", alignItems: "center", background: "transparent", border: "none", color: "#6b7a70", cursor: "pointer" }}>
                                     <FiX size={18} />
                                 </button>
                             </div>
-                            <form onSubmit={atualizarJogador} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                            <form className="player-edit-form" onSubmit={atualizarJogador} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                                 <input className="field" type="text" placeholder="Nome" value={editando.nome || ""}
                                     onChange={(e) => setEditando({ ...editando, nome: e.target.value })} required />
                                 <input className="field" type="number" placeholder="Idade" value={editando.idade || ""}

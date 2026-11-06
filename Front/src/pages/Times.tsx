@@ -6,6 +6,7 @@ import Swal from "sweetalert2";
 import api, { comImagem } from "../services/api";
 import { getTimeId, getTimeImageUrl } from "../utils/timeHelpers";
 import "./Times.css";
+import "./responsive.css";
 import logoBrasileirao from "../assets/Logo_br.png";
 import type { ApiResponse, Time } from "../types";
 

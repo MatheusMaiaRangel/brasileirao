@@ -1,7 +1,8 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:3000",
+  baseURL: import.meta.env.VITE_API_URL?.trim() ||
+    (import.meta.env.DEV ? "http://localhost:3000" : window.location.origin),
 });
 
 // Monta o corpo de um POST/PUT: se houver arquivo, envia como multipart
