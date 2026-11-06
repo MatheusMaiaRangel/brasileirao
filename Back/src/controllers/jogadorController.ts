@@ -28,28 +28,28 @@ export async function criarJogador(request: FastifyRequest, reply: FastifyReply)
     });
   }
 
-  if (!nome || nome.trim() === '') {
+  if (typeof nome !== 'string' || nome.trim() === '') {
     return reply.code(400).send({
       sucesso: false,
       erro: 'O campo "nome" é obrigatório',
     });
   }
 
-  if (!idade || idade.trim() === '') {
+  if (idade === undefined || idade === null || String(idade).trim() === '') {
     return reply.code(400).send({
       sucesso: false,
       erro: 'O campo "idade" é obrigatório',
     });
   }
 
-  if (!posicao || posicao.trim() === '') {
+  if (typeof posicao !== 'string' || posicao.trim() === '') {
     return reply.code(400).send({
       sucesso: false,
       erro: 'O campo "posicao" é obrigatório',
     });
   }
 
-  if (!numeroCamisa || numeroCamisa.trim() === '') {
+  if (numeroCamisa === undefined || numeroCamisa === null || String(numeroCamisa).trim() === '') {
     return reply.code(400).send({
       sucesso: false,
       erro: 'O campo "numeroCamisa" é obrigatório',
@@ -62,7 +62,7 @@ export async function criarJogador(request: FastifyRequest, reply: FastifyReply)
     return reply.code(400).send({ sucesso: false, erro: 'O número da camisa deve ser um inteiro positivo' });
   }
 
-  if (!timeId || timeId.trim() === '') {
+  if (typeof timeId !== 'string' || timeId.trim() === '') {
     return reply.code(400).send({
       sucesso: false,
       erro: 'O campo "timeId" é obrigatório',

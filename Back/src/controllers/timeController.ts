@@ -3,6 +3,12 @@ import db from '../database';
 import { lerRequisicaoComImagem } from '../utils/multipart';
 import type { IdParams, TimeRecord } from '../types';
 
+function anoFundacaoValido(valor: unknown): boolean {
+  if ((typeof valor !== 'string' && typeof valor !== 'number') || String(valor).trim() === '') return false;
+  const ano = Number(valor);
+  return Number.isSafeInteger(ano) && ano > 0 && ano <= new Date().getFullYear();
+}
+
 export async function criarTime(request: FastifyRequest, reply: FastifyReply) {
   let fields: Record<string, string>, imagemPath: string | null;
   try {
@@ -14,23 +20,23 @@ export async function criarTime(request: FastifyRequest, reply: FastifyReply) {
   const { nome, estadio, anoFundacao } = fields;
 
   // validação de campos obrigatorios
-  if (!nome || nome.trim() === '') {
+  if (typeof nome !== 'string' || nome.trim() === '') {
     return reply.code(400).send({
       sucesso: false,
       erro: 'O campo "nome" é obrigatório',
     });
   }
-  if (!estadio || estadio.trim() === '') {
+  if (typeof estadio !== 'string' || estadio.trim() === '') {
     return reply.code(400).send({ sucesso: false, erro: 'O campo "estádio" é obrigatório' });
   }
-  if (anoFundacao === undefined || anoFundacao === null || anoFundacao === '' || isNaN(Number(anoFundacao)) || !Number.isInteger(Number(anoFundacao))) {
-    return reply.code(400).send({ sucesso: false, erro: 'O campo "Ano de Fundação" é obrigatório e precisa ser um número' });
+  if (!anoFundacaoValido(anoFundacao)) {
+    return reply.code(400).send({ sucesso: false, erro: 'Ano de fundação deve ser um ano válido' });
   }
 
   const time = await db.times.insertAsync({
     nome: nome.trim(),
     estadio: estadio.trim(),
-    anoFundacao,
+    anoFundacao: Number(anoFundacao),
     imagem: imagemPath,
   });
 
@@ -81,6 +87,16 @@ export async function editarTime(request: FastifyRequest<{ Params: IdParams }>, 
     return reply.code(400).send({ sucesso: false, erro: 'Nenhum campo para atualizar' });
   }
 
+  if (nome !== undefined && (typeof nome !== 'string' || nome.trim() === '')) {
+    return reply.code(400).send({ sucesso: false, erro: 'O campo "nome" deve conter texto' });
+  }
+  if (estadio !== undefined && (typeof estadio !== 'string' || estadio.trim() === '')) {
+    return reply.code(400).send({ sucesso: false, erro: 'O campo "estádio" deve conter texto' });
+  }
+  if (anoFundacao !== undefined && !anoFundacaoValido(anoFundacao)) {
+    return reply.code(400).send({ sucesso: false, erro: 'Ano de fundação deve ser um ano válido' });
+  }
+
   const update: Partial<TimeRecord> = {};
   if (nome && String(nome).trim() !== '') {
     update.nome = String(nome).trim();
@@ -90,7 +106,7 @@ export async function editarTime(request: FastifyRequest<{ Params: IdParams }>, 
   }
 
   if (anoFundacao !== undefined){
-    update.anoFundacao = anoFundacao;
+    update.anoFundacao = Number(anoFundacao);
   }
 
   if (imagemPath) {
