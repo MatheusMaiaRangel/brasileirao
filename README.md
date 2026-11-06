@@ -21,8 +21,39 @@ Você pode acessar nosso projeto em:  https://brasileiraofatec.vercel.app
 
 Cada diretório possui um README próprio contendo as instruções de instalação e execução.
 
-- **front/** → Aplicação React
-- **back/** → API Node.js + NeDB
+- **Front/** → Aplicação React
+- **Back/** → API Node.js + NeDB
+
+## Entrega da atividade Fatec
+
+O problema resolvido é o cadastro e a consulta de clubes do Brasileirão e seus jogadores em uma única interface. O público-alvo são pessoas que precisam organizar elencos e informações básicas dos clubes. O projeto usa uma API REST própria para aplicar as regras de negócio e gravar os dados.
+
+- [Planejamento, requisitos e modelo de dados](docs/plano-projeto.md)
+- [Endpoints, configuração e testes do backend](Back/README.md)
+- [Configuração e execução do frontend](Front/README.md)
+- [Roteiro da apresentação final](docs/roteiro-apresentacao.md)
+
+### Executar localmente
+
+Em dois terminais, a partir da raiz do repositório:
+
+```bash
+cd Back
+npm ci
+npm run dev
+```
+
+```bash
+cd Front
+npm ci
+npm run dev
+```
+
+O backend usa `http://localhost:3000` e o Vite informa o endereço local do frontend no terminal. Para executar os testes, rode `npm test` dentro de `Back`. As opções de configuração e os comandos de verificação estão nos READMEs de cada pasta.
+
+### Evidência do ciclo TDD
+
+A validação de idade e número da camisa foi implementada em três commits desta branch: `385be46` (Red: teste falhou com `201 !== 400`), `9ec166d` (Green: validação implementada e teste passou) e `949742b` (Refactor: validação compartilhada, com testes ainda passando). O teste está em `Back/test/validacao-jogador.test.ts`. O roteiro de apresentação explica como demonstrar esse histórico.
 
 <h2>👥 Créditos</h2>
 <table>
