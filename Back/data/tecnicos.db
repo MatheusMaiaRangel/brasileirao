@@ -1,0 +1,3 @@
+{"$$indexCreated":{"fieldName":"timeId","unique":false,"sparse":false}}
+{"$$indexCreated":{"fieldName":"timeId"}}
+{"nome":"Leonardo Jardim","idade":"52","imagem":"/uploads/1794440769556-10682-1448025497.webp","timeId":"SLa9Afxp0qJnWJK4","_id":"9ObJf8n4b0nWcuLj","createdAt":{"$$date":1794440769561},"updatedAt":{"$$date":1794440769561}}
