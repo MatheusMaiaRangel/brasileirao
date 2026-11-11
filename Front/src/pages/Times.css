@@ -20,7 +20,7 @@
 
 /* Formulário (novo registro) */
 .panel { background: #131b16; border: 1px solid #1f2a23; border-radius: 8px; padding: 18px; }
-.form { display: grid; grid-template-columns: 2fr 2fr 1fr 1.4fr auto; gap: 12px; margin-bottom: 48px; align-items: center; }
+.form { display: grid; grid-template-columns: 2fr 2fr 1fr 1.4fr 1.4fr auto; gap: 12px; margin-bottom: 48px; align-items: center; }
 .field { width: 100%; padding: 12px 14px; border: 1px solid #2a352e; border-radius: 6px; background: #161e19; color: #eef1ee; font-family: inherit; font-size: 14px; outline: none; transition: border-color .15s; }
 .field::placeholder { color: #6b7a70; }
 .field:focus { border-color: #3fb950; }
@@ -96,6 +96,46 @@
 	align-items: stretch;
 }
 
+/* Caixa de informações do clube; com foto, o estádio fica dentro dela, ao lado dos dados */
+.team-info {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 18px;
+	background: #131b16;
+	border: 1px solid #1f2a23;
+	border-radius: 8px;
+	padding: 18px;
+}
+
+.team-info.with-stadium {
+	grid-template-columns: minmax(140px, 1fr) minmax(220px, 1.4fr);
+}
+
+.team-info-fields {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 14px;
+	align-content: start;
+}
+
+.team-stadium {
+	position: relative;
+	min-height: 220px;
+	border-radius: 8px;
+	border: 1px solid #1f2a23;
+	overflow: hidden;
+	background: #0e1410;
+}
+
+.team-stadium-image {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+}
+
 .team-hero {
 	position: relative;
 	min-height: 260px;
@@ -148,6 +188,14 @@
 @media (max-width: 860px) {
 	.team-overview {
 		grid-template-columns: 1fr;
+	}
+
+	.team-info.with-stadium {
+		grid-template-columns: 1fr;
+	}
+
+	.team-stadium {
+		min-height: 200px;
 	}
 
 	.team-hero {

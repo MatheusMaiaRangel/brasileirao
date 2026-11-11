@@ -5,6 +5,7 @@ export interface Time {
   estadio: string;
   anoFundacao: string | number;
   imagem?: string | null;
+  imagemEstadio?: string | null;
 }
 
 export interface Jogador {

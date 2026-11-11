@@ -15,6 +15,7 @@ type JogadorEdicao = Jogador & { originalTimeId: string };
 export default function TimeDetalhes({ time, onVoltar }: { time: Time; onVoltar: () => void }) {
     const timeId = time.id || time._id;
     const imageUrl = getTimeImageUrl(time, api.defaults.baseURL);
+    const estadioUrl = getTimeImageUrl({ imagem: time.imagemEstadio }, api.defaults.baseURL);
 
     const [jogadores, setJogadores] = useState<Jogador[]>([]);
     const [carregando, setCarregando] = useState(true);
@@ -217,10 +218,8 @@ export default function TimeDetalhes({ time, onVoltar }: { time: Time; onVoltar:
                                 </div>
                             )}
                         </div>
-                        <div style={{
-                            display: "grid", gridTemplateColumns: "1fr", gap: 14,
-                            background: "#131b16", border: "1px solid #1f2a23", borderRadius: 8, padding: 18
-                        }}>
+                        <div className={`team-info${estadioUrl ? " with-stadium" : ""}`}>
+                            <div className="team-info-fields">
                             <div>
                                 <div style={{ fontSize: 11, letterSpacing: "0.15em", color: "#6b7a70", textTransform: "uppercase", marginBottom: 4 }}>Nome</div>
                                 <div style={{ fontFamily: "Oswald, sans-serif", fontSize: 18, fontWeight: 600 }}>{time.nome}</div>
@@ -233,6 +232,12 @@ export default function TimeDetalhes({ time, onVoltar }: { time: Time; onVoltar:
                                 <div style={{ fontSize: 11, letterSpacing: "0.15em", color: "#6b7a70", textTransform: "uppercase", marginBottom: 4 }}>Fundação</div>
                                 <div style={{ fontFamily: "Oswald, sans-serif", fontSize: 18, fontWeight: 600, color: "#3fb950" }}>{time.anoFundacao}</div>
                             </div>
+                            </div>
+                            {estadioUrl && (
+                                <div className="team-stadium">
+                                    <img src={estadioUrl} alt={`Estádio ${time.estadio}`} className="team-stadium-image" />
+                                </div>
+                            )}
                         </div>
                     </div>
                 </section>

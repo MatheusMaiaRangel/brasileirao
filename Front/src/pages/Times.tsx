@@ -18,6 +18,9 @@ type TimeFieldsProps<T extends TimeFormValues> = {
   arquivo: File | null;
   onArquivo: (arquivo: File | null) => void;
   imagemAtualUrl?: string;
+  arquivoEstadio: File | null;
+  onArquivoEstadio: (arquivo: File | null) => void;
+  estadioAtualUrl?: string;
   idPrefix: "new" | "edit";
 };
 
@@ -34,14 +37,21 @@ function getErrorMsg(error: unknown, fallback: string): string {
   return error instanceof Error ? error.message : fallback;
 }
 
-// Campos do formulário (reutilizados no "Novo Registro" e no modal de edição)
-function TimeFields<T extends TimeFormValues>({ values, onChange, arquivo, onArquivo, imagemAtualUrl, idPrefix }: TimeFieldsProps<T>) {
-  const isEdit = idPrefix === "edit";
-
-  const fileLabel = (
-    <label className={`file-label${arquivo ? " has-file" : ""}`} title="Escudo do clube (opcional)">
+// Campo de upload de imagem; na edição mostra o preview (arquivo novo ou imagem atual)
+function UploadField({ arquivo, onArquivo, atualUrl, isEdit, titulo, textoNovo, textoTroca, alt }: {
+  arquivo: File | null;
+  onArquivo: (arquivo: File | null) => void;
+  atualUrl?: string;
+  isEdit: boolean;
+  titulo: string;
+  textoNovo: string;
+  textoTroca: string;
+  alt: string;
+}) {
+  const label = (
+    <label className={`file-label${arquivo ? " has-file" : ""}`} title={titulo}>
       <FiImage size={15} />
-      {arquivo ? arquivo.name : isEdit ? "Trocar escudo" : "Escudo (opcional)"}
+      {arquivo ? arquivo.name : isEdit ? textoTroca : textoNovo}
       <input
         type="file"
         accept="image/*"
@@ -50,6 +60,28 @@ function TimeFields<T extends TimeFormValues>({ values, onChange, arquivo, onArq
       />
     </label>
   );
+
+  if (!isEdit) return label;
+
+  return (
+    <div className="upload-row">
+      {(arquivo || atualUrl) && (
+        <img
+          className="img-preview"
+          src={arquivo ? URL.createObjectURL(arquivo) : atualUrl}
+          alt={alt}
+        />
+      )}
+      {label}
+    </div>
+  );
+}
+
+// Campos do formulário (reutilizados no "Novo Registro" e no modal de edição)
+function TimeFields<T extends TimeFormValues>({
+  values, onChange, arquivo, onArquivo, imagemAtualUrl, arquivoEstadio, onArquivoEstadio, estadioAtualUrl, idPrefix,
+}: TimeFieldsProps<T>) {
+  const isEdit = idPrefix === "edit";
 
   return (
     <>
@@ -78,20 +110,26 @@ function TimeFields<T extends TimeFormValues>({ values, onChange, arquivo, onArq
         onChange={(e) => onChange({ ...values, anoFundacao: e.target.value })}
         required
       />
-      {isEdit ? (
-        <div className="upload-row">
-          {(arquivo || imagemAtualUrl) && (
-            <img
-              className="img-preview"
-              src={arquivo ? URL.createObjectURL(arquivo) : imagemAtualUrl}
-              alt="Escudo do clube"
-            />
-          )}
-          {fileLabel}
-        </div>
-      ) : (
-        fileLabel
-      )}
+      <UploadField
+        arquivo={arquivo}
+        onArquivo={onArquivo}
+        atualUrl={imagemAtualUrl}
+        isEdit={isEdit}
+        titulo="Escudo do clube (opcional)"
+        textoNovo="Escudo (opcional)"
+        textoTroca="Trocar escudo"
+        alt="Escudo do clube"
+      />
+      <UploadField
+        arquivo={arquivoEstadio}
+        onArquivo={onArquivoEstadio}
+        atualUrl={estadioAtualUrl}
+        isEdit={isEdit}
+        titulo="Foto do estádio (opcional)"
+        textoNovo="Foto do estádio (opcional)"
+        textoTroca="Trocar foto do estádio"
+        alt="Foto do estádio"
+      />
     </>
   );
 }
@@ -149,19 +187,23 @@ export default function Times({ onSelecionarTime }: { onSelecionarTime: (time: T
   const [times, setTimes] = useState<Time[]>([]);
   const [form, setForm] = useState(INITIAL_FORM);
   const [arquivo, setArquivo] = useState<File | null>(null);          // escudo selecionado no "Novo Registro"
+  const [arquivoEstadio, setArquivoEstadio] = useState<File | null>(null); // foto do estádio no "Novo Registro"
   const [message, setMessage] = useState<Feedback | null>(null);          // feedback de sucesso/erro
   const [editingTime, setEditingTime] = useState<Time | null>(null);  // clube sendo editado (abre o modal)
   const [arquivoEdicao, setArquivoEdicao] = useState<File | null>(null); // novo escudo no modal de edição
+  const [arquivoEstadioEdicao, setArquivoEstadioEdicao] = useState<File | null>(null); // nova foto do estádio na edição
   const messageTimeoutRef = useRef<number | null>(null);
 
   // Abre/fecha o modal de edição, sempre limpando o arquivo selecionado
   function abrirEdicao(time: Time) {
     setEditingTime(time);
     setArquivoEdicao(null);
+    setArquivoEstadioEdicao(null);
   }
   function fecharEdicao() {
     setEditingTime(null);
     setArquivoEdicao(null);
+    setArquivoEstadioEdicao(null);
   }
 
   // Mostra uma mensagem de feedback por 3 segundos
@@ -195,9 +237,10 @@ export default function Times({ onSelecionarTime }: { onSelecionarTime: (time: T
     event.preventDefault();
     const formElement = event.currentTarget;
     try {
-      await api.post("/times", comImagem(form, arquivo));
+      await api.post("/times", comImagem(form, arquivo, arquivoEstadio));
       setForm(INITIAL_FORM);
       setArquivo(null);
+      setArquivoEstadio(null);
       formElement.reset();
       await carregarTimes();
       showMessage("Time adicionado com sucesso.");
@@ -249,7 +292,7 @@ export default function Times({ onSelecionarTime }: { onSelecionarTime: (time: T
         estadio: editingTime.estadio,
         anoFundacao: editingTime.anoFundacao,
       };
-      await api.put(`/times/${id}`, comImagem(dados, arquivoEdicao));
+      await api.put(`/times/${id}`, comImagem(dados, arquivoEdicao, arquivoEstadioEdicao));
       fecharEdicao();
       await carregarTimes();
       showMessage("Time atualizado com sucesso.");
@@ -309,6 +352,8 @@ export default function Times({ onSelecionarTime }: { onSelecionarTime: (time: T
             onChange={setForm}
             arquivo={arquivo}
             onArquivo={setArquivo}
+            arquivoEstadio={arquivoEstadio}
+            onArquivoEstadio={setArquivoEstadio}
             idPrefix="new"
           />
           <button type="submit" className="btn btn-primary">
@@ -352,6 +397,9 @@ export default function Times({ onSelecionarTime }: { onSelecionarTime: (time: T
                 arquivo={arquivoEdicao}
                 onArquivo={setArquivoEdicao}
                 imagemAtualUrl={getTimeImageUrl(editingTime, api.defaults.baseURL)}
+                arquivoEstadio={arquivoEstadioEdicao}
+                onArquivoEstadio={setArquivoEstadioEdicao}
+                estadioAtualUrl={getTimeImageUrl({ imagem: editingTime.imagemEstadio }, api.defaults.baseURL)}
                 idPrefix="edit"
               />
               <div className="modal-actions">
