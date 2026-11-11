@@ -17,10 +17,11 @@ Informações de clubes e elencos ficam dispersas e são difíceis de manter atu
 
 | Entidade | Campos principais | Relação |
 | --- | --- | --- |
-| Clube (`times`) | `_id`, `nome`, `estadio`, `anoFundacao`, `imagem`, `imagemEstadio` | Possui vários jogadores |
+| Clube (`times`) | `_id`, `nome`, `estadio`, `anoFundacao`, `imagem`, `imagemEstadio` | Possui vários jogadores e um técnico |
 | Jogador (`jogadores`) | `_id`, `nome`, `idade`, `posicao`, `numeroCamisa`, `imagem`, `timeId` | Pertence a um clube pelo `timeId` |
+| Técnico (`tecnicos`) | `_id`, `nome`, `idade`, `imagem`, `timeId` | Um por clube, pelo `timeId` |
 
-O NeDB gera o `_id` e os carimbos de data. A API mantém a integridade da relação ao exigir um clube existente para cadastrar ou transferir jogadores e ao bloquear a exclusão de um clube que ainda tenha jogadores.
+O NeDB gera o `_id` e os carimbos de data. A API mantém a integridade da relação ao exigir um clube existente para cadastrar ou transferir jogadores e ao bloquear a exclusão de um clube que ainda tenha jogadores ou técnico; cada clube aceita no máximo um técnico.
 
 ## Arquitetura e decisões técnicas
 

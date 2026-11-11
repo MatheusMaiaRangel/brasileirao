@@ -5,6 +5,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import timeRoutes from './routes/timeRoutes';
 import jogadorRoutes from './routes/jogadorRoutes';
+import tecnicoRoutes from './routes/tecnicoRoutes';
 
 const uploadsDir = path.resolve(process.env.UPLOADS_DIR || path.join(process.cwd(), 'public/uploads'));
 
@@ -32,6 +33,7 @@ export function buildServer() {
   });
   fastify.register(timeRoutes);
   fastify.register(jogadorRoutes);
+  fastify.register(tecnicoRoutes);
 
   fastify.get('/', async () => ({ status: 'ok', mensagem: 'API Fastify + NeDB funcionando!' }));
 

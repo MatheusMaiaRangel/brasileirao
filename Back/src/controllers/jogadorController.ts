@@ -1,13 +1,9 @@
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import db from '../database';
 import { lerRequisicaoComImagem } from '../utils/multipart';
+import { inteiroPositivo } from '../utils/validacao';
 import type { IdParams, JogadorRecord, TimeIdParams } from '../types';
 
-function inteiroPositivo(valor: unknown): boolean {
-  const texto = String(valor);
-  const numero = Number(texto);
-  return /^\d+$/.test(texto) && Number.isSafeInteger(numero) && numero > 0;
-}
 
 export async function criarJogador(request: FastifyRequest, reply: FastifyReply) {
   let fields: Record<string, string>, imagemPath: string | null;

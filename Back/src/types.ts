@@ -15,6 +15,13 @@ export interface JogadorRecord {
   timeId: string;
 }
 
+export interface TecnicoRecord {
+  nome: string;
+  idade: string | number;
+  imagem: string | null;
+  timeId: string;
+}
+
 export interface IdParams {
   id: string;
 }

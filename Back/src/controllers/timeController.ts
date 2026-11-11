@@ -55,6 +55,14 @@ export async function deletarTime(request: FastifyRequest<{ Params: IdParams }>,
     });
   }
 
+  const tecnicoVinculado = await db.tecnicos.findOneAsync({ timeId: id });
+  if (tecnicoVinculado) {
+    return reply.code(409).send({
+      sucesso: false,
+      erro: 'Não é possível deletar o time porque existe um técnico vinculado a ele',
+    });
+  }
+
   const numRemoved = await db.times.removeAsync({ _id: id }, {});
 
   if (numRemoved === 0) {

@@ -53,11 +53,11 @@ Crie um arquivo `.env` local se precisar alterar as opções abaixo. O arquivo `
 | `DATA_DIR` | `Back/data` | Diretório dos arquivos NeDB |
 | `UPLOADS_DIR` | `Back/public/uploads` | Diretório das imagens enviadas |
 
-O NeDB grava os clubes e jogadores em arquivos locais (`brasileirao.db` e `jogadores.db`). Essa escolha permite uma instalação simples para a demonstração local, sem serviço externo. Os testes usam diretórios temporários independentes e não alteram os dados do projeto. Em hospedagem sem disco persistente, é preciso configurar uma solução de armazenamento persistente antes de depender de novos cadastros em produção.
+O NeDB grava os clubes e jogadores em arquivos locais (`brasileirao.db`, `jogadores.db` e `tecnicos.db`). Essa escolha permite uma instalação simples para a demonstração local, sem serviço externo. Os testes usam diretórios temporários independentes e não alteram os dados do projeto. Em hospedagem sem disco persistente, é preciso configurar uma solução de armazenamento persistente antes de depender de novos cadastros em produção.
 
 ## Endpoints
 
-Os endpoints de clubes e jogadores respondem com `{ "sucesso": true, "dados": ... }` quando há conteúdo. Erros seguem `{ "sucesso": false, "erro": "mensagem" }`. Criação retorna `201`, consulta e edição retornam `200`, exclusão retorna `204`, entrada inválida retorna `400`, registro ausente retorna `404` e clube com jogadores não pode ser excluído (`409`). Falhas inesperadas retornam `500`. O endpoint de saúde `/` retorna `status` e `mensagem`.
+Os endpoints de clubes e jogadores respondem com `{ "sucesso": true, "dados": ... }` quando há conteúdo. Erros seguem `{ "sucesso": false, "erro": "mensagem" }`. Criação retorna `201`, consulta e edição retornam `200`, exclusão retorna `204`, entrada inválida retorna `400`, registro ausente retorna `404` e clube com jogadores ou técnico não pode ser excluído (`409`). Falhas inesperadas retornam `500`. O endpoint de saúde `/` retorna `status` e `mensagem`.
 
 | Método | Rota | Descrição |
 | --- | --- | --- |
@@ -66,13 +66,17 @@ Os endpoints de clubes e jogadores respondem com `{ "sucesso": true, "dados": ..
 | `GET` | `/times/:id` | Busca um clube |
 | `POST` | `/times` | Cadastra clube |
 | `PUT` | `/times/:id` | Atualiza campos de um clube |
-| `DELETE` | `/times/:id` | Exclui clube sem jogadores vinculados |
+| `DELETE` | `/times/:id` | Exclui clube sem jogadores nem técnico vinculados |
 | `GET` | `/times/:timeId/jogadores` | Lista jogadores do clube |
 | `GET` | `/jogadores` | Lista todos os jogadores |
 | `POST` | `/jogadores` | Cadastra jogador em clube existente |
 | `PUT` | `/jogadores/:id` | Atualiza dados do jogador |
 | `PATCH` | `/jogadores/:id` | Transfere jogador para outro clube |
 | `DELETE` | `/jogadores/:id` | Exclui jogador |
+| `GET` | `/times/:timeId/tecnico` | Retorna o técnico do clube (`dados: null` se não houver) |
+| `POST` | `/tecnicos` | Cadastra técnico em clube existente (um por clube; `409` se já houver) |
+| `PUT` | `/tecnicos/:id` | Atualiza dados do técnico |
+| `DELETE` | `/tecnicos/:id` | Exclui técnico |
 | `GET` | `/uploads/:file` | Lê imagem enviada |
 
 `POST` e `PUT` aceitam JSON sem imagem ou `multipart/form-data` com arquivo no campo `imagem` e os mesmos campos de texto. Em `/times`, a foto do estádio vai no campo de arquivo `imagemEstadio` (opcional, independente do escudo). O limite de imagem é 5 MB.
