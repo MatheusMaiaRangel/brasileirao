@@ -3,6 +3,7 @@ export interface TimeRecord {
   estadio: string;
   anoFundacao: string | number;
   imagem: string | null;
+  imagemEstadio: string | null;
 }
 
 export interface JogadorRecord {

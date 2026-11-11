@@ -75,7 +75,7 @@ Os endpoints de clubes e jogadores respondem com `{ "sucesso": true, "dados": ..
 | `DELETE` | `/jogadores/:id` | Exclui jogador |
 | `GET` | `/uploads/:file` | Lê imagem enviada |
 
-`POST` e `PUT` aceitam JSON sem imagem ou `multipart/form-data` com arquivo no campo `imagem` e os mesmos campos de texto. O limite de imagem é 5 MB.
+`POST` e `PUT` aceitam JSON sem imagem ou `multipart/form-data` com arquivo no campo `imagem` e os mesmos campos de texto. Em `/times`, a foto do estádio vai no campo de arquivo `imagemEstadio` (opcional, independente do escudo). O limite de imagem é 5 MB.
 
 ### Exemplos de requisição
 
@@ -85,7 +85,7 @@ curl -X POST http://localhost:3000/times \
   -d '{"nome":"Clube Exemplo","estadio":"Arena Exemplo","anoFundacao":2000}'
 ```
 
-Resposta: `201 {"sucesso":true,"dados":{"_id":"...","nome":"Clube Exemplo","estadio":"Arena Exemplo","anoFundacao":2000,"imagem":null}}`.
+Resposta: `201 {"sucesso":true,"dados":{"_id":"...","nome":"Clube Exemplo","estadio":"Arena Exemplo","anoFundacao":2000,"imagem":null,"imagemEstadio":null}}`.
 
 ```bash
 curl -X POST http://localhost:3000/jogadores \

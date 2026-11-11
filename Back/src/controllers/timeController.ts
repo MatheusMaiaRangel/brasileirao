@@ -10,9 +10,9 @@ function anoFundacaoValido(valor: unknown): boolean {
 }
 
 export async function criarTime(request: FastifyRequest, reply: FastifyReply) {
-  let fields: Record<string, string>, imagemPath: string | null;
+  let fields: Record<string, string>, imagemPath: string | null, imagemEstadioPath: string | null;
   try {
-    ({ fields, imagemPath } = await lerRequisicaoComImagem(request));
+    ({ fields, imagemPath, imagemEstadioPath } = await lerRequisicaoComImagem(request));
   } catch (err) {
     return reply.code(500).send({ sucesso: false, erro: 'Erro ao salvar imagem' });
   }
@@ -38,6 +38,7 @@ export async function criarTime(request: FastifyRequest, reply: FastifyReply) {
     estadio: estadio.trim(),
     anoFundacao: Number(anoFundacao),
     imagem: imagemPath,
+    imagemEstadio: imagemEstadioPath,
   });
 
   return reply.code(201).send({ sucesso: true, dados: time });
@@ -69,9 +70,9 @@ export async function deletarTime(request: FastifyRequest<{ Params: IdParams }>,
 export async function editarTime(request: FastifyRequest<{ Params: IdParams }>, reply: FastifyReply) {
   const { id } = request.params;
 
-  let fields: Record<string, string>, imagemPath: string | null;
+  let fields: Record<string, string>, imagemPath: string | null, imagemEstadioPath: string | null;
   try {
-    ({ fields, imagemPath } = await lerRequisicaoComImagem(request));
+    ({ fields, imagemPath, imagemEstadioPath } = await lerRequisicaoComImagem(request));
   } catch (err) {
     return reply.code(500).send({ sucesso: false, erro: 'Erro ao salvar imagem' });
   }
@@ -83,7 +84,7 @@ export async function editarTime(request: FastifyRequest<{ Params: IdParams }>, 
     return reply.code(404).send({ sucesso: false, erro: 'Time não encontrado' });
   }
 
-  if (!nome && !estadio && anoFundacao === undefined && !imagemPath) {
+  if (!nome && !estadio && anoFundacao === undefined && !imagemPath && !imagemEstadioPath) {
     return reply.code(400).send({ sucesso: false, erro: 'Nenhum campo para atualizar' });
   }
 
@@ -111,6 +112,10 @@ export async function editarTime(request: FastifyRequest<{ Params: IdParams }>, 
 
   if (imagemPath) {
     update.imagem = imagemPath;
+  }
+
+  if (imagemEstadioPath) {
+    update.imagemEstadio = imagemEstadioPath;
   }
 
   // garantir que o update seja persistido usando callback
