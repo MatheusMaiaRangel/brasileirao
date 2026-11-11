@@ -5,6 +5,7 @@ import { FiPlus, FiTrash2, FiEdit2, FiX, FiImage } from "react-icons/fi";
 import Swal from "sweetalert2";
 import api, { comImagem } from "../services/api";
 import { getTimeImageUrl } from "../utils/timeHelpers";
+import TecnicoSecao from "./TecnicoSecao";
 import "./Times.css";
 import "./responsive.css";
 import type { ApiResponse, Jogador, Time } from "../types";
@@ -27,11 +28,11 @@ export default function TimeDetalhes({ time, onVoltar }: { time: Time; onVoltar:
     const [message, setMessage] = useState<Feedback | null>(null);
     const messageTimeoutRef = useRef<number | null>(null);
 
-    function showMessage(text: string, type: Feedback["type"] = "success") {
+    const showMessage = useCallback((text: string, type: Feedback["type"] = "success") => {
         if (messageTimeoutRef.current) window.clearTimeout(messageTimeoutRef.current);
         setMessage({ text, type });
         messageTimeoutRef.current = window.setTimeout(() => setMessage(null), 3000);
-    }
+    }, []);
 
     const carregarJogadores = useCallback(async () => {
         setCarregando(true);
@@ -44,7 +45,7 @@ export default function TimeDetalhes({ time, onVoltar }: { time: Time; onVoltar:
         } finally {
             setCarregando(false);
         }
-    }, [timeId]);
+    }, [timeId, showMessage]);
 
     const carregarTimes = useCallback(async () => {
         try {
@@ -242,6 +243,9 @@ export default function TimeDetalhes({ time, onVoltar }: { time: Time; onVoltar:
                     </div>
                 </section>
 
+                {/* Técnico */}
+                <TecnicoSecao timeId={timeId as string} onMensagem={showMessage} />
+
                 {/* Novo jogador */}
                 <section style={{ marginBottom: 48 }}>
                     <div style={{ fontFamily: "Oswald, sans-serif", fontSize: 12, letterSpacing: "0.25em", color: "#6b7a70", textTransform: "uppercase", marginBottom: 12 }}>
@@ -265,14 +269,7 @@ export default function TimeDetalhes({ time, onVoltar }: { time: Time; onVoltar:
                             <input type="file" accept="image/*" hidden
                                 onChange={(e) => setArquivoJogador(e.target.files?.[0] || null)} />
                         </label>
-                        <button type="submit" style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 6,
-                            background: "#3fb950", color: "#0e1410", border: "none",
-                            borderRadius: 6, padding: "0 22px", fontWeight: 600, fontSize: 14,
-                            cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap"
-                        }}>
+                        <button type="submit" className="btn btn-primary btn-add">
                             <FiPlus size={16} /> Adicionar
                         </button>
                     </form>

@@ -126,7 +126,7 @@ function TimeFields<T extends TimeFormValues>({
         atualUrl={estadioAtualUrl}
         isEdit={isEdit}
         titulo="Foto do estádio (opcional)"
-        textoNovo="Foto do estádio (opcional)"
+        textoNovo="Foto do estádio"
         textoTroca="Trocar foto do estádio"
         alt="Foto do estádio"
       />
@@ -356,7 +356,7 @@ export default function Times({ onSelecionarTime }: { onSelecionarTime: (time: T
             onArquivoEstadio={setArquivoEstadio}
             idPrefix="new"
           />
-          <button type="submit" className="btn btn-primary">
+          <button type="submit" className="btn btn-primary btn-add">
             <FiPlus size={16} /> Adicionar
           </button>
         </form>

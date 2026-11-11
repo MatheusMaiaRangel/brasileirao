@@ -20,7 +20,7 @@
 
 /* Formulário (novo registro) */
 .panel { background: #131b16; border: 1px solid #1f2a23; border-radius: 8px; padding: 18px; }
-.form { display: grid; grid-template-columns: 2fr 2fr 1fr 1.4fr 1.4fr auto; gap: 12px; margin-bottom: 48px; align-items: center; }
+.form { display: grid; grid-template-columns: 1.6fr 1.6fr 1.1fr 1.3fr 1.5fr auto; gap: 12px; margin-bottom: 48px; align-items: center; }
 .field { width: 100%; padding: 12px 14px; border: 1px solid #2a352e; border-radius: 6px; background: #161e19; color: #eef1ee; font-family: inherit; font-size: 14px; outline: none; transition: border-color .15s; }
 .field::placeholder { color: #6b7a70; }
 .field:focus { border-color: #3fb950; }
@@ -43,6 +43,8 @@
 .btn { display: flex; align-items: center; justify-content: center; gap: 6px; border: none; border-radius: 6px; font-weight: 600; font-size: 14px; cursor: pointer; font-family: inherit; white-space: nowrap; }
 .btn-primary { background: #3fb950; color: #0e1410; padding: 0 22px; }
 .btn-primary.modal-btn { padding: 10px 16px; }
+/* botões "Adicionar" (clube, jogador e técnico): mais gordinhos e arredondados */
+.btn-add { min-height: 46px; padding: 0 28px; border-radius: 14px; font-size: 15px; }
 .btn-ghost { background: transparent; color: #6b7a70; border: 1px solid #2a352e; padding: 10px 14px; }
 
 /* Grid de clubes */
