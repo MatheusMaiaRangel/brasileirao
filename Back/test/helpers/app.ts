@@ -5,6 +5,7 @@ import type { FastifyInstance } from 'fastify';
 
 export interface AppDeTeste {
   app: FastifyInstance;
+  db: typeof import('../../src/database/index').db;
   dataDir: string;
   uploadsDir: string;
   fechar: () => Promise<void>;
@@ -29,6 +30,7 @@ export async function criarAppDeTeste(prefixo = 'brasileirao-'): Promise<AppDeTe
 
   return {
     app,
+    db,
     dataDir,
     uploadsDir,
     fechar: async () => {
