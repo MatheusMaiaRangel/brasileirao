@@ -199,6 +199,12 @@ export async function editarJogador(request: FastifyRequest<{ Params: IdParams }
     return reply.code(400).send({ sucesso: false, erro: 'Nenhum campo para atualizar' });
   }
 
+  if (nome !== undefined && (typeof nome !== 'string' || nome.trim() === '')) {
+    return reply.code(400).send({ sucesso: false, erro: 'O campo "nome" deve conter texto' });
+  }
+  if (posicao !== undefined && (typeof posicao !== 'string' || posicao.trim() === '')) {
+    return reply.code(400).send({ sucesso: false, erro: 'O campo "posicao" deve conter texto' });
+  }
   if (idade !== undefined && !inteiroPositivo(idade)) {
     return reply.code(400).send({ sucesso: false, erro: 'A idade deve ser um inteiro positivo' });
   }
