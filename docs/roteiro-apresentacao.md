@@ -25,7 +25,7 @@ Os comandos `curl` completos e o formato dos erros estão em [Back/README.md](..
 2. **Green — `9ec166d`:** a validação mínima no cadastro e na edição fez os testes passarem.
 3. **Refactor — `949742b`:** a checagem duplicada foi extraída para uma função compartilhada, mantendo os testes passando.
 
-Mostrem `git log --oneline` e `git show` de cada commit. Executem `npm test` dentro de `Back`, depois `npm run typecheck`. Também há testes de entradas inválidas e respostas `400`, `404` e `409`.
+Mostrem `git log --oneline` e `git show` de cada commit. Executem `npm test` dentro de `Back` e de `Front`, depois `npm run test:coverage`. Há ainda quatro ciclos de TDD que corrigiram bugs encontrados pelos testes, incluindo uma falha de segurança em `/uploads`; a tabela e o passo a passo para reproduzir um Red ao vivo estão em [testes.md](testes.md).
 
 ## Antes da apresentação
 

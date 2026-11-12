@@ -2,9 +2,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { pipeline } from 'node:stream/promises';
 import type { FastifyRequest } from 'fastify';
+import { UPLOADS_DIR } from './uploads';
 
 const CAMPO_IMAGEM_ESTADIO = 'imagemEstadio';
-const UPLOADS_DIR = path.resolve(process.env.UPLOADS_DIR || path.join(process.cwd(), 'public/uploads'));
 
 /**
  * Lê uma requisição que pode conter imagem.

@@ -1,7 +1,8 @@
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import db from '../database';
+import { atualizarPorId } from '../database/atualizar';
 import { lerRequisicaoComImagem } from '../utils/multipart';
-import { inteiroPositivo } from '../utils/validacao';
+import { inteiroPositivo, textoPreenchido } from '../utils/validacao';
 import type { IdParams, JogadorRecord, TimeIdParams } from '../types';
 
 
@@ -24,7 +25,7 @@ export async function criarJogador(request: FastifyRequest, reply: FastifyReply)
     });
   }
 
-  if (typeof nome !== 'string' || nome.trim() === '') {
+  if (!textoPreenchido(nome)) {
     return reply.code(400).send({
       sucesso: false,
       erro: 'O campo "nome" é obrigatório',
@@ -38,7 +39,7 @@ export async function criarJogador(request: FastifyRequest, reply: FastifyReply)
     });
   }
 
-  if (typeof posicao !== 'string' || posicao.trim() === '') {
+  if (!textoPreenchido(posicao)) {
     return reply.code(400).send({
       sucesso: false,
       erro: 'O campo "posicao" é obrigatório',
@@ -58,7 +59,7 @@ export async function criarJogador(request: FastifyRequest, reply: FastifyReply)
     return reply.code(400).send({ sucesso: false, erro: 'O número da camisa deve ser um inteiro positivo' });
   }
 
-  if (typeof timeId !== 'string' || timeId.trim() === '') {
+  if (!textoPreenchido(timeId)) {
     return reply.code(400).send({
       sucesso: false,
       erro: 'O campo "timeId" é obrigatório',
@@ -125,10 +126,14 @@ export async function listarJogadoresPorTime(request: FastifyRequest<{ Params: T
   });
 }
 
-export async function transferenciaJogador(request: FastifyRequest<{ Params: IdParams; Body: { timeId?: string } }>, reply: FastifyReply) {
+export async function transferenciaJogador(request: FastifyRequest<{ Params: IdParams; Body: { timeId?: unknown } }>, reply: FastifyReply) {
   const { id } = request.params;
   const body = request.body || {};
   const { timeId } = body;
+
+  if (!textoPreenchido(timeId)) {
+    return reply.code(400).send({ sucesso: false, erro: 'O campo "timeId" é obrigatório' });
+  }
 
   const update: Partial<JogadorRecord> = {};
 
@@ -149,33 +154,14 @@ export async function transferenciaJogador(request: FastifyRequest<{ Params: IdP
   } 
 
   update.timeId = timeId;
-  
 
-  // garantir que o update seja persistido usando callback
   try {
-    await new Promise<void>((resolve, reject) => {
-      db.jogadores.update({ _id: id }, { $set: update }, {}, (err) => {
-        if (err) return reject(err);
-        resolve();
-      });
-    });
+    const jogadorTransferido = await atualizarPorId(db.jogadores, id, update);
+    return reply.send({ sucesso: true, dados: jogadorTransferido });
   } catch (err) {
+    request.log.error(err);
     return reply.code(500).send({ sucesso: false, erro: 'Erro ao transferir jogador' });
   }
-
-  const jogadorTransferido = await db.jogadores.findOneAsync({ _id: id });
-
-  // compacta o datafile usando a instância em execução (aguarda conclusão)
-  try {
-    await new Promise<void>((resolve) => db.jogadores.compactDatafile(() => resolve()));
-  } catch (err) {
-    // não bloquear a resposta se a compactação falhar
-  }
-
-  return reply.send({ sucesso: true, dados: jogadorTransferido });
-
-
-
 }
 
 export async function editarJogador(request: FastifyRequest<{ Params: IdParams }>, reply: FastifyReply) {
@@ -199,6 +185,12 @@ export async function editarJogador(request: FastifyRequest<{ Params: IdParams }
     return reply.code(400).send({ sucesso: false, erro: 'Nenhum campo para atualizar' });
   }
 
+  if (nome !== undefined && (!textoPreenchido(nome))) {
+    return reply.code(400).send({ sucesso: false, erro: 'O campo "nome" deve conter texto' });
+  }
+  if (posicao !== undefined && (!textoPreenchido(posicao))) {
+    return reply.code(400).send({ sucesso: false, erro: 'O campo "posicao" deve conter texto' });
+  }
   if (idade !== undefined && !inteiroPositivo(idade)) {
     return reply.code(400).send({ sucesso: false, erro: 'A idade deve ser um inteiro positivo' });
   }
@@ -227,26 +219,11 @@ export async function editarJogador(request: FastifyRequest<{ Params: IdParams }
     update.imagem = imagemPath;
   }
 
-  // garantir que o update seja persistido usando callback
   try {
-    await new Promise<void>((resolve, reject) => {
-      db.jogadores.update({ _id: id }, { $set: update }, {}, (err) => {
-        if (err) return reject(err);
-        resolve();
-      });
-    });
+    const jogadorAtualizado = await atualizarPorId(db.jogadores, id, update);
+    return reply.send({ sucesso: true, dados: jogadorAtualizado });
   } catch (err) {
+    request.log.error(err);
     return reply.code(500).send({ sucesso: false, erro: 'Erro ao atualizar jogador' });
   }
-
-  const jogadorAtualizado = await db.jogadores.findOneAsync({ _id: id });
-
-  // compacta o datafile usando a instância em execução (aguarda conclusão)
-  try {
-    await new Promise<void>((resolve) => db.jogadores.compactDatafile(() => resolve()));
-  } catch (err) {
-    // não bloquear a resposta se a compactação falhar
-  }
-
-  return reply.send({ sucesso: true, dados: jogadorAtualizado });
 }

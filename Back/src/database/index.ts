@@ -4,7 +4,7 @@ import type { JogadorRecord, TecnicoRecord, TimeRecord } from '../types';
 
 const dataDir = path.resolve(process.env.DATA_DIR || path.join(process.cwd(), 'data'));
 
-const db = {
+export const db = {
   times: new Datastore<TimeRecord>({
     filename: path.join(dataDir, 'brasileirao.db'),
     autoload: true,

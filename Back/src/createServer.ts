@@ -2,26 +2,26 @@ import Fastify from 'fastify';
 import multipartPlugin from '@fastify/multipart';
 import corsPlugin from '@fastify/cors';
 import fs from 'node:fs';
-import path from 'node:path';
 import timeRoutes from './routes/timeRoutes';
 import jogadorRoutes from './routes/jogadorRoutes';
 import tecnicoRoutes from './routes/tecnicoRoutes';
-
-const uploadsDir = path.resolve(process.env.UPLOADS_DIR || path.join(process.cwd(), 'public/uploads'));
+import { resolverArquivoDeUpload } from './utils/uploads';
 
 export function buildServer() {
-  const fastify = Fastify({ logger: true });
+  const fastify = Fastify({ logger: { level: process.env.LOG_LEVEL || 'info' } });
 
   fastify.register(multipartPlugin, {
     limits: { fileSize: 5 * 1024 * 1024 },
   });
 
   fastify.get<{ Params: { file: string } }>('/uploads/:file', async (request, reply) => {
-    const filePath = path.join(uploadsDir, request.params.file);
+    const naoEncontrado = () => reply.code(404).send({ sucesso: false, erro: 'Arquivo não encontrado' });
+    const filePath = resolverArquivoDeUpload(request.params.file);
+    if (!filePath) return naoEncontrado();
     try {
       await fs.promises.access(filePath, fs.constants.R_OK);
     } catch {
-      return reply.code(404).send({ sucesso: false, erro: 'Arquivo não encontrado' });
+      return naoEncontrado();
     }
     reply.type('application/octet-stream');
     return reply.send(fs.createReadStream(filePath));
@@ -40,9 +40,10 @@ export function buildServer() {
   fastify.setErrorHandler((error, _request, reply) => {
     fastify.log.error(error);
     const failure = error as Error & { statusCode?: number };
-    reply.code(failure.statusCode || 500).send({
+    const statusCode = failure.statusCode || 500;
+    reply.code(statusCode).send({
       sucesso: false,
-      erro: failure.message || 'Erro interno do servidor',
+      erro: statusCode < 500 && failure.message ? failure.message : 'Erro interno do servidor',
     });
   });
 

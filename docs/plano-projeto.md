@@ -25,7 +25,7 @@ O NeDB gera o `_id` e os carimbos de data. A API mantém a integridade da relaç
 
 ## Arquitetura e decisões técnicas
 
-O frontend em React e Vite envia requisições HTTP para uma API própria em Fastify e TypeScript. A API concentra validações e regras de negócio; o NeDB grava os dados em arquivos locais. JSON é usado nas operações comuns e `multipart/form-data` quando há imagem. O Fastify permite testar as rotas com `inject`, sem iniciar uma porta de rede. Os testes usam `node:test` com `tsx`.
+O frontend em React e Vite envia requisições HTTP para uma API própria em Fastify e TypeScript. A API concentra validações e regras de negócio; o NeDB grava os dados em arquivos locais. JSON é usado nas operações comuns e `multipart/form-data` quando há imagem. O Fastify permite testar as rotas com `inject`, sem iniciar uma porta de rede. Os testes da API usam `node:test` com `tsx`; os da interface usam Vitest e Testing Library.
 
 O NeDB foi escolhido para a execução local simples, sem serviço de banco externo. Para hospedagem em plataforma sem disco persistente, esse armazenamento precisa ser substituído ou conectado a um serviço persistente para garantir que novos registros sobrevivam a reinicializações.
 
@@ -40,7 +40,7 @@ A relação de rotas, métodos, dados e exemplos está em [Back/README.md](../Ba
 | 1 | Este plano, modelo de dados, rotas e repositório Git |
 | 2 | API Fastify e endpoints; os testes atuais não comprovam, por si só, a data da entrega parcial |
 | 3 | Interface React integrada ao CRUD |
-| 4 | Testes ampliados, validações e ciclo TDD demonstrável nos commits `385be46`, `9ec166d` e `949742b` |
+| 4 | Testes ampliados no back e no front, cobertura mínima no CI e ciclos TDD descritos em [testes.md](testes.md) |
 | 5 | README, roteiro de apresentação e demonstração final do grupo |
 
 As datas e a aceitação das entregas semanais dependem da avaliação do professor; este documento registra as evidências disponíveis no repositório.

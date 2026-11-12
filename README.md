@@ -31,6 +31,7 @@ O problema resolvido é o cadastro e a consulta de clubes do Brasileirão e seus
 - [Planejamento, requisitos e modelo de dados](docs/plano-projeto.md)
 - [Endpoints, configuração e testes do backend](Back/README.md)
 - [Configuração e execução do frontend](Front/README.md)
+- [Testes automatizados e ciclos de TDD](docs/testes.md)
 - [Roteiro da apresentação final](docs/roteiro-apresentacao.md)
 
 ### Executar localmente
@@ -49,11 +50,13 @@ npm ci
 npm run dev
 ```
 
-O backend usa `http://localhost:3000` e o Vite informa o endereço local do frontend no terminal. Para executar os testes, rode `npm test` dentro de `Back`. As opções de configuração e os comandos de verificação estão nos READMEs de cada pasta.
+O backend usa `http://localhost:3000` e o Vite informa o endereço local do frontend no terminal. Para executar os testes, rode `npm test` dentro de `Back` e dentro de `Front` (`npm run test:coverage` mostra a cobertura). As opções de configuração e os comandos de verificação estão nos READMEs de cada pasta.
 
-### Evidência do ciclo TDD
+### Testes e evidência do ciclo TDD
 
-A validação de idade e número da camisa foi implementada em três commits desta branch: `385be46` (Red: teste falhou com `201 !== 400`), `9ec166d` (Green: validação implementada e teste passou) e `949742b` (Refactor: validação compartilhada, com testes ainda passando). O teste está em `Back/test/validacao-jogador.test.ts`. O roteiro de apresentação explica como demonstrar esse histórico.
+São 120 testes na API e 68 na interface, com cobertura acima de 90% das linhas. O GitHub Actions roda todos eles a cada push e pull request. A estratégia, os comandos e a tabela com todos os ciclos Red → Green → Refactor (com os hashes dos commits) estão em [docs/testes.md](docs/testes.md).
+
+O primeiro ciclo do grupo validou idade e número da camisa: `385be46` (Red), `9ec166d` (Green) e `949742b` (Refactor). Os ciclos seguintes corrigiram bugs encontrados pelos testes, entre eles uma falha de *path traversal* na rota `/uploads`.
 
 <h2>👥 Créditos</h2>
 <table>
