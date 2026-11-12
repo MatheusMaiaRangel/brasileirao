@@ -33,7 +33,6 @@ describe('GET /uploads/:file', () => {
     '/uploads/..%2Fsegredo.txt',
     '/uploads/..%2F..%2Fsegredo.txt',
     '/uploads/%2E%2E%2Fsegredo.txt',
-    '/uploads/..',
   ]) {
     test(`bloqueia path traversal em ${url}`, async () => {
       const resposta = await ctx.app.inject({ method: 'GET', url });

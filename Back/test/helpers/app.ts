@@ -22,6 +22,8 @@ export async function criarAppDeTeste(prefixo = 'brasileirao-'): Promise<AppDeTe
   process.env.UPLOADS_DIR = uploadsDir;
 
   const { buildServer } = await import('../../src/createServer.js');
+  const { db } = await import('../../src/database/index.js');
+  const bancos = [db.times, db.jogadores, db.tecnicos];
   const app = buildServer();
   await app.ready();
 
@@ -31,7 +33,9 @@ export async function criarAppDeTeste(prefixo = 'brasileirao-'): Promise<AppDeTe
     uploadsDir,
     fechar: async () => {
       await app.close();
-      await fs.rm(dataDir, { recursive: true, force: true });
+      // espera a fila de gravação do NeDB terminar antes de apagar a pasta
+      await Promise.all(bancos.map((banco) => banco.compactDatafileAsync()));
+      await fs.rm(dataDir, { recursive: true, force: true, maxRetries: 5, retryDelay: 50 });
     },
   };
 }

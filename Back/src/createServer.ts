@@ -17,7 +17,10 @@ export function buildServer() {
   });
 
   fastify.get<{ Params: { file: string } }>('/uploads/:file', async (request, reply) => {
-    const filePath = path.join(uploadsDir, request.params.file);
+    const filePath = path.resolve(uploadsDir, request.params.file);
+    if (path.dirname(filePath) !== uploadsDir) {
+      return reply.code(404).send({ sucesso: false, erro: 'Arquivo não encontrado' });
+    }
     try {
       await fs.promises.access(filePath, fs.constants.R_OK);
     } catch {
