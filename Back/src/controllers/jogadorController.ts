@@ -125,10 +125,14 @@ export async function listarJogadoresPorTime(request: FastifyRequest<{ Params: T
   });
 }
 
-export async function transferenciaJogador(request: FastifyRequest<{ Params: IdParams; Body: { timeId?: string } }>, reply: FastifyReply) {
+export async function transferenciaJogador(request: FastifyRequest<{ Params: IdParams; Body: { timeId?: unknown } }>, reply: FastifyReply) {
   const { id } = request.params;
   const body = request.body || {};
   const { timeId } = body;
+
+  if (!textoPreenchido(timeId)) {
+    return reply.code(400).send({ sucesso: false, erro: 'O campo "timeId" é obrigatório' });
+  }
 
   const update: Partial<JogadorRecord> = {};
 
