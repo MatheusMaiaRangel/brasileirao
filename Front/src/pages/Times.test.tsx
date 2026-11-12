@@ -1,25 +1,14 @@
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { AxiosError, AxiosHeaders } from "axios";
 import Swal from "sweetalert2";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import api from "../services/api";
+import { CANCELADO, CONFIRMADO, erroDaApi } from "../test/utils";
 import type { Time } from "../types";
 import Times from "./Times";
 
-vi.mock("../services/api", async (importOriginal) => {
-  const original = await importOriginal<typeof import("../services/api")>();
-  return {
-    ...original,
-    default: {
-      get: vi.fn(),
-      post: vi.fn(),
-      put: vi.fn(),
-      delete: vi.fn(),
-      defaults: { baseURL: "http://api.test" },
-    },
-  };
-});
+vi.mock("../services/api", async (importOriginal) =>
+  (await import("../test/utils")).mockModuloApi(importOriginal));
 
 vi.mock("sweetalert2", () => ({ default: { fire: vi.fn() } }));
 
@@ -31,13 +20,6 @@ const INTER: Time = { _id: "t2", nome: "Internacional", estadio: "Beira-Rio", an
 
 function respostaLista(times: Time[]) {
   return { data: { sucesso: true, dados: times } };
-}
-
-function erroDaApi(status: number, erro: string) {
-  const headers = new AxiosHeaders();
-  return new AxiosError("Request failed", "ERR_BAD_REQUEST", { headers }, null, {
-    status, statusText: "", headers: {}, config: { headers }, data: { sucesso: false, erro },
-  });
 }
 
 function renderizar(onSelecionarTime = vi.fn()) {
@@ -212,7 +194,7 @@ describe("<Times />", () => {
 
   describe("exclusão (DELETE /times/:id)", () => {
     it("pede confirmação e exclui", async () => {
-      swalMock.fire.mockResolvedValue({ isConfirmed: true, isDenied: false, isDismissed: false });
+      swalMock.fire.mockResolvedValue(CONFIRMADO);
       apiMock.delete.mockResolvedValue({ data: null });
       const { usuario, onSelecionarTime } = renderizar();
       await screen.findByText("Grêmio");
@@ -226,7 +208,7 @@ describe("<Times />", () => {
     });
 
     it("não exclui quando o usuário cancela", async () => {
-      swalMock.fire.mockResolvedValue({ isConfirmed: false, isDenied: false, isDismissed: true });
+      swalMock.fire.mockResolvedValue(CANCELADO);
       const { usuario } = renderizar();
       await screen.findByText("Grêmio");
 
@@ -237,7 +219,7 @@ describe("<Times />", () => {
     });
 
     it("mostra o erro 409 quando o clube tem jogadores", async () => {
-      swalMock.fire.mockResolvedValue({ isConfirmed: true, isDenied: false, isDismissed: false });
+      swalMock.fire.mockResolvedValue(CONFIRMADO);
       apiMock.delete.mockRejectedValue(
         erroDaApi(409, "Não é possível deletar o time porque existem jogadores vinculados a ele"),
       );
