@@ -2,12 +2,10 @@ import Fastify from 'fastify';
 import multipartPlugin from '@fastify/multipart';
 import corsPlugin from '@fastify/cors';
 import fs from 'node:fs';
-import path from 'node:path';
 import timeRoutes from './routes/timeRoutes';
 import jogadorRoutes from './routes/jogadorRoutes';
 import tecnicoRoutes from './routes/tecnicoRoutes';
-
-const uploadsDir = path.resolve(process.env.UPLOADS_DIR || path.join(process.cwd(), 'public/uploads'));
+import { resolverArquivoDeUpload } from './utils/uploads';
 
 export function buildServer() {
   const fastify = Fastify({ logger: true });
@@ -17,14 +15,13 @@ export function buildServer() {
   });
 
   fastify.get<{ Params: { file: string } }>('/uploads/:file', async (request, reply) => {
-    const filePath = path.resolve(uploadsDir, request.params.file);
-    if (path.dirname(filePath) !== uploadsDir) {
-      return reply.code(404).send({ sucesso: false, erro: 'Arquivo não encontrado' });
-    }
+    const naoEncontrado = () => reply.code(404).send({ sucesso: false, erro: 'Arquivo não encontrado' });
+    const filePath = resolverArquivoDeUpload(request.params.file);
+    if (!filePath) return naoEncontrado();
     try {
       await fs.promises.access(filePath, fs.constants.R_OK);
     } catch {
-      return reply.code(404).send({ sucesso: false, erro: 'Arquivo não encontrado' });
+      return naoEncontrado();
     }
     reply.type('application/octet-stream');
     return reply.send(fs.createReadStream(filePath));
