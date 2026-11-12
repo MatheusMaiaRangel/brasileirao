@@ -1,5 +1,6 @@
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import db from '../database';
+import { atualizarPorId } from '../database/atualizar';
 import { lerRequisicaoComImagem } from '../utils/multipart';
 import { anoFundacaoValido, textoPreenchido } from '../utils/validacao';
 import type { IdParams, TimeRecord } from '../types';
@@ -121,28 +122,13 @@ export async function editarTime(request: FastifyRequest<{ Params: IdParams }>, 
     update.imagemEstadio = imagemEstadioPath;
   }
 
-  // garantir que o update seja persistido usando callback
   try {
-    await new Promise<void>((resolve, reject) => {
-      db.times.update({ _id: id }, { $set: update }, {}, (err) => {
-        if (err) return reject(err);
-        resolve();
-      });
-    });
+    const timeAtualizado = await atualizarPorId(db.times, id, update);
+    return reply.send({ sucesso: true, dados: timeAtualizado });
   } catch (err) {
+    request.log.error(err);
     return reply.code(500).send({ sucesso: false, erro: 'Erro ao atualizar time' });
   }
-
-  const timeAtualizado = await db.times.findOneAsync({ _id: id });
-
-  // compacta o datafile usando a instância em execução (aguarda conclusão)
-  try {
-    await new Promise<void>((resolve) => db.times.compactDatafile(() => resolve()));
-  } catch (err) {
-    // não bloquear a resposta se a compactação falhar
-  }
-
-  return reply.send({ sucesso: true, dados: timeAtualizado });
 }
 
 

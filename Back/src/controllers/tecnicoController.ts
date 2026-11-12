@@ -1,5 +1,6 @@
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import db from '../database';
+import { atualizarPorId } from '../database/atualizar';
 import { lerRequisicaoComImagem } from '../utils/multipart';
 import { inteiroPositivo, textoPreenchido } from '../utils/validacao';
 import type { IdParams, TecnicoRecord, TimeIdParams } from '../types';
@@ -100,14 +101,12 @@ export async function editarTecnico(request: FastifyRequest<{ Params: IdParams }
   }
 
   try {
-    await db.tecnicos.updateAsync({ _id: id }, { $set: update }, {});
+    const tecnicoAtualizado = await atualizarPorId(db.tecnicos, id, update);
+    return reply.send({ sucesso: true, dados: tecnicoAtualizado });
   } catch (err) {
+    request.log.error(err);
     return reply.code(500).send({ sucesso: false, erro: 'Erro ao atualizar técnico' });
   }
-
-  const tecnicoAtualizado = await db.tecnicos.findOneAsync({ _id: id });
-
-  return reply.send({ sucesso: true, dados: tecnicoAtualizado });
 }
 
 export async function deletarTecnico(request: FastifyRequest<{ Params: IdParams }>, reply: FastifyReply) {
