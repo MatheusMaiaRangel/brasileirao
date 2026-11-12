@@ -40,9 +40,10 @@ export function buildServer() {
   fastify.setErrorHandler((error, _request, reply) => {
     fastify.log.error(error);
     const failure = error as Error & { statusCode?: number };
-    reply.code(failure.statusCode || 500).send({
+    const statusCode = failure.statusCode || 500;
+    reply.code(statusCode).send({
       sucesso: false,
-      erro: failure.message || 'Erro interno do servidor',
+      erro: statusCode < 500 && failure.message ? failure.message : 'Erro interno do servidor',
     });
   });
 
