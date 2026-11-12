@@ -1,7 +1,7 @@
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import db from '../database';
 import { lerRequisicaoComImagem } from '../utils/multipart';
-import { inteiroPositivo } from '../utils/validacao';
+import { inteiroPositivo, textoPreenchido } from '../utils/validacao';
 import type { IdParams, JogadorRecord, TimeIdParams } from '../types';
 
 
@@ -24,7 +24,7 @@ export async function criarJogador(request: FastifyRequest, reply: FastifyReply)
     });
   }
 
-  if (typeof nome !== 'string' || nome.trim() === '') {
+  if (!textoPreenchido(nome)) {
     return reply.code(400).send({
       sucesso: false,
       erro: 'O campo "nome" é obrigatório',
@@ -38,7 +38,7 @@ export async function criarJogador(request: FastifyRequest, reply: FastifyReply)
     });
   }
 
-  if (typeof posicao !== 'string' || posicao.trim() === '') {
+  if (!textoPreenchido(posicao)) {
     return reply.code(400).send({
       sucesso: false,
       erro: 'O campo "posicao" é obrigatório',
@@ -58,7 +58,7 @@ export async function criarJogador(request: FastifyRequest, reply: FastifyReply)
     return reply.code(400).send({ sucesso: false, erro: 'O número da camisa deve ser um inteiro positivo' });
   }
 
-  if (typeof timeId !== 'string' || timeId.trim() === '') {
+  if (!textoPreenchido(timeId)) {
     return reply.code(400).send({
       sucesso: false,
       erro: 'O campo "timeId" é obrigatório',
@@ -199,10 +199,10 @@ export async function editarJogador(request: FastifyRequest<{ Params: IdParams }
     return reply.code(400).send({ sucesso: false, erro: 'Nenhum campo para atualizar' });
   }
 
-  if (nome !== undefined && (typeof nome !== 'string' || nome.trim() === '')) {
+  if (nome !== undefined && (!textoPreenchido(nome))) {
     return reply.code(400).send({ sucesso: false, erro: 'O campo "nome" deve conter texto' });
   }
-  if (posicao !== undefined && (typeof posicao !== 'string' || posicao.trim() === '')) {
+  if (posicao !== undefined && (!textoPreenchido(posicao))) {
     return reply.code(400).send({ sucesso: false, erro: 'O campo "posicao" deve conter texto' });
   }
   if (idade !== undefined && !inteiroPositivo(idade)) {

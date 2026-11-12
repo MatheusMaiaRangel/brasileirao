@@ -1,7 +1,7 @@
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import db from '../database';
 import { lerRequisicaoComImagem } from '../utils/multipart';
-import { inteiroPositivo } from '../utils/validacao';
+import { inteiroPositivo, textoPreenchido } from '../utils/validacao';
 import type { IdParams, TecnicoRecord, TimeIdParams } from '../types';
 
 export async function criarTecnico(request: FastifyRequest, reply: FastifyReply) {
@@ -14,7 +14,7 @@ export async function criarTecnico(request: FastifyRequest, reply: FastifyReply)
 
   const { nome, idade, timeId } = fields;
 
-  if (typeof nome !== 'string' || nome.trim() === '') {
+  if (!textoPreenchido(nome)) {
     return reply.code(400).send({ sucesso: false, erro: 'O campo "nome" é obrigatório' });
   }
   if (idade === undefined || idade === null || String(idade).trim() === '') {
@@ -23,7 +23,7 @@ export async function criarTecnico(request: FastifyRequest, reply: FastifyReply)
   if (!inteiroPositivo(idade)) {
     return reply.code(400).send({ sucesso: false, erro: 'A idade deve ser um inteiro positivo' });
   }
-  if (typeof timeId !== 'string' || timeId.trim() === '') {
+  if (!textoPreenchido(timeId)) {
     return reply.code(400).send({ sucesso: false, erro: 'O campo "timeId" é obrigatório' });
   }
 
@@ -81,7 +81,7 @@ export async function editarTecnico(request: FastifyRequest<{ Params: IdParams }
     return reply.code(400).send({ sucesso: false, erro: 'Nenhum campo para atualizar' });
   }
 
-  if (nome !== undefined && (typeof nome !== 'string' || nome.trim() === '')) {
+  if (nome !== undefined && (!textoPreenchido(nome))) {
     return reply.code(400).send({ sucesso: false, erro: 'O campo "nome" deve conter texto' });
   }
   if (idade !== undefined && !inteiroPositivo(idade)) {

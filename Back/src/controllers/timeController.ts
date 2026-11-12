@@ -1,13 +1,8 @@
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import db from '../database';
 import { lerRequisicaoComImagem } from '../utils/multipart';
+import { anoFundacaoValido, textoPreenchido } from '../utils/validacao';
 import type { IdParams, TimeRecord } from '../types';
-
-function anoFundacaoValido(valor: unknown): boolean {
-  if ((typeof valor !== 'string' && typeof valor !== 'number') || String(valor).trim() === '') return false;
-  const ano = Number(valor);
-  return Number.isSafeInteger(ano) && ano > 0 && ano <= new Date().getFullYear();
-}
 
 export async function criarTime(request: FastifyRequest, reply: FastifyReply) {
   let fields: Record<string, string>, imagemPath: string | null, imagemEstadioPath: string | null;
@@ -20,13 +15,13 @@ export async function criarTime(request: FastifyRequest, reply: FastifyReply) {
   const { nome, estadio, anoFundacao } = fields;
 
   // validação de campos obrigatorios
-  if (typeof nome !== 'string' || nome.trim() === '') {
+  if (!textoPreenchido(nome)) {
     return reply.code(400).send({
       sucesso: false,
       erro: 'O campo "nome" é obrigatório',
     });
   }
-  if (typeof estadio !== 'string' || estadio.trim() === '') {
+  if (!textoPreenchido(estadio)) {
     return reply.code(400).send({ sucesso: false, erro: 'O campo "estádio" é obrigatório' });
   }
   if (!anoFundacaoValido(anoFundacao)) {
@@ -96,10 +91,10 @@ export async function editarTime(request: FastifyRequest<{ Params: IdParams }>, 
     return reply.code(400).send({ sucesso: false, erro: 'Nenhum campo para atualizar' });
   }
 
-  if (nome !== undefined && (typeof nome !== 'string' || nome.trim() === '')) {
+  if (nome !== undefined && (!textoPreenchido(nome))) {
     return reply.code(400).send({ sucesso: false, erro: 'O campo "nome" deve conter texto' });
   }
-  if (estadio !== undefined && (typeof estadio !== 'string' || estadio.trim() === '')) {
+  if (estadio !== undefined && (!textoPreenchido(estadio))) {
     return reply.code(400).send({ sucesso: false, erro: 'O campo "estádio" deve conter texto' });
   }
   if (anoFundacao !== undefined && !anoFundacaoValido(anoFundacao)) {
