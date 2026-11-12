@@ -52,12 +52,13 @@ Crie um arquivo `.env` local se precisar alterar as opções abaixo. O arquivo `
 | `PORT` | `3000` | Porta HTTP da API |
 | `DATA_DIR` | `Back/data` | Diretório dos arquivos NeDB |
 | `UPLOADS_DIR` | `Back/public/uploads` | Diretório das imagens enviadas |
+| `LOG_LEVEL` | `info` | Nível de log do Fastify (`silent` desliga) |
 
 O NeDB grava os clubes e jogadores em arquivos locais (`brasileirao.db`, `jogadores.db` e `tecnicos.db`). Essa escolha permite uma instalação simples para a demonstração local, sem serviço externo. Os testes usam diretórios temporários independentes e não alteram os dados do projeto. Em hospedagem sem disco persistente, é preciso configurar uma solução de armazenamento persistente antes de depender de novos cadastros em produção.
 
 ## Endpoints
 
-Os endpoints de clubes e jogadores respondem com `{ "sucesso": true, "dados": ... }` quando há conteúdo. Erros seguem `{ "sucesso": false, "erro": "mensagem" }`. Criação retorna `201`, consulta e edição retornam `200`, exclusão retorna `204`, entrada inválida retorna `400`, registro ausente retorna `404` e clube com jogadores ou técnico não pode ser excluído (`409`). Falhas inesperadas retornam `500`. O endpoint de saúde `/` retorna `status` e `mensagem`.
+Os endpoints de clubes e jogadores respondem com `{ "sucesso": true, "dados": ... }` quando há conteúdo. Erros seguem `{ "sucesso": false, "erro": "mensagem" }`. Criação retorna `201`, consulta e edição retornam `200`, exclusão retorna `204`, entrada inválida retorna `400`, registro ausente retorna `404` e clube com jogadores ou técnico não pode ser excluído (`409`). Falhas inesperadas retornam `500` com a mensagem genérica `Erro interno do servidor`. O endpoint de saúde `/` retorna `status` e `mensagem`.
 
 | Método | Rota | Descrição |
 | --- | --- | --- |
@@ -101,4 +102,11 @@ O jogador deve ter nome, posição, idade e número da camisa. Idade e camisa de
 
 ## Testes
 
-`npm test` executa os testes HTTP por injeção do Fastify, cobrindo CRUD, upload, transferência, validações e respostas de erro. `npm run typecheck` verifica os tipos; `npm run build` gera `dist/` para execução com `npm start`.
+```bash
+npm test                # 120 testes (unidade + integração HTTP)
+npm run test:coverage   # falha se a cobertura ficar abaixo de 90% das linhas ou 80% dos branches
+```
+
+Os testes usam `node:test` e `fastify.inject`, sem abrir porta. Cada arquivo grava em um diretório temporário próprio, então os dados de `data/` não são alterados. Os logs do Fastify ficam silenciados nos testes (`LOG_LEVEL=silent` em `test/setup.ts`). Detalhes e ciclos de TDD estão em [docs/testes.md](../docs/testes.md).
+
+`npm run typecheck` verifica os tipos; `npm run build` gera `dist/` para execução com `npm start`.

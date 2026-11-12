@@ -32,13 +32,17 @@ npm run dev
 
 Após a inicialização, acesse a URL exibida no terminal.
 
-## Verificação e build
+## Verificação, testes e build
 
 ```bash
 npm run typecheck
 npm run lint
+npm test                # 68 testes com Vitest + Testing Library
+npm run test:coverage   # cobertura (meta mínima de 80%), relatório em coverage/
 npm run build
 ```
+
+Os testes simulam a API, então não precisam do backend rodando. Detalhes em [docs/testes.md](../docs/testes.md).
 
 O frontend usa TypeScript (`.ts` e `.tsx`).
 
@@ -52,4 +56,4 @@ VITE_API_URL=http://localhost:3000
 
 O build de produção usa `Front/.env.production`, que aponta para a API pública `https://backdobrasileirao.vercel.app`. Em outra hospedagem, configure `VITE_API_URL` para a URL do backend antes de fazer o build. Se frontend e backend estiverem no mesmo domínio, a aplicação também pode usar a origem atual quando a variável não estiver definida.
 
-Para validar a interface, rode `npm run typecheck`, `npm run lint` e `npm run build`. No celular, os formulários e o modal passam para uma coluna.
+Para validar a interface, rode `npm run typecheck`, `npm run lint`, `npm test` e `npm run build`. No celular, os formulários e o modal passam para uma coluna.
