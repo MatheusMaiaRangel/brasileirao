@@ -81,6 +81,7 @@ describe('CRUD de jogadores (/jogadores)', () => {
         ...multipart({ idade: '30', numeroCamisa: '7' }, [{ campo: 'imagem', nome: 'nova.png', conteudo: 'png' }]),
       });
       assert.equal(resposta.statusCode, 200);
+      // comportamento atual: campos vindos de multipart são gravados como texto
       assert.equal(resposta.json().dados.idade, '30');
       assert.equal(resposta.json().dados.numeroCamisa, '7');
       assert.match(resposta.json().dados.imagem, /nova\.png$/);

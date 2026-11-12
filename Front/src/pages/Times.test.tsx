@@ -147,8 +147,6 @@ describe("<Times />", () => {
     });
 
     it("mostra preview do novo escudo e envia FormData", async () => {
-      const createObjectURL = vi.fn(() => "blob:preview");
-      vi.stubGlobal("URL", Object.assign(URL, { createObjectURL }));
       apiMock.put.mockResolvedValue({ data: { sucesso: true } });
       const { usuario } = renderizar();
       await screen.findByText("Grêmio");
@@ -162,7 +160,6 @@ describe("<Times />", () => {
       await usuario.click(within(modal).getByRole("button", { name: "Salvar" }));
 
       expect(apiMock.put.mock.calls[0][1]).toBeInstanceOf(FormData);
-      vi.unstubAllGlobals();
     });
 
     it("fecha o modal sem salvar em Cancelar e no X", async () => {

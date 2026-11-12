@@ -91,13 +91,14 @@ describe('CRUD de clubes (/times)', () => {
     });
 
     test('atualiza só o escudo via multipart', async () => {
+      const idEscudo = await criarTime(ctx.app, { nome: 'Com Escudo' });
       const resposta = await ctx.app.inject({
-        method: 'PUT', url: `/times/${id}`,
+        method: 'PUT', url: `/times/${idEscudo}`,
         ...multipart({}, [{ campo: 'imagem', nome: 'novo escudo.png', conteudo: 'png' }]),
       });
       assert.equal(resposta.statusCode, 200);
       assert.match(resposta.json().dados.imagem, /^\/uploads\/\d+-novo_escudo\.png$/);
-      assert.equal(resposta.json().dados.nome, 'Novo Nome');
+      assert.equal(resposta.json().dados.nome, 'Com Escudo');
     });
 
     for (const [descricao, payload, erro] of [

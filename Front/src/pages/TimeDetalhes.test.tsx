@@ -214,18 +214,16 @@ describe("<TimeDetalhes />", () => {
     });
 
     it("troca a foto com preview e envia FormData", async () => {
-      vi.stubGlobal("URL", Object.assign(URL, { createObjectURL: vi.fn(() => "blob:jogador") }));
       apiMock.put.mockResolvedValue({ data: { sucesso: true } });
       const { usuario } = renderizar();
       await usuario.click((await screen.findAllByTitle("Editar jogador"))[1]);
 
       expect(within(modal()).queryByAltText("Foto do jogador")).not.toBeInTheDocument();
       await usuario.upload(within(modal()).getByLabelText("Trocar foto (opcional)"), new File(["x"], "nova.png", { type: "image/png" }));
-      expect(within(modal()).getByAltText("Foto do jogador")).toHaveAttribute("src", "blob:jogador");
+      expect(within(modal()).getByAltText("Foto do jogador")).toHaveAttribute("src", "blob:preview");
       await usuario.click(within(modal()).getByRole("button", { name: "Salvar" }));
 
       expect(apiMock.put.mock.calls[0][1]).toBeInstanceOf(FormData);
-      vi.unstubAllGlobals();
     });
 
     it.each([

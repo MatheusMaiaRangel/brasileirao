@@ -120,17 +120,15 @@ describe("<TecnicoSecao />", () => {
     });
 
     it("troca a foto na edição com preview", async () => {
-      vi.stubGlobal("URL", Object.assign(URL, { createObjectURL: vi.fn(() => "blob:tecnico") }));
       apiMock.put.mockResolvedValue({ data: { sucesso: true } });
       const { usuario } = renderizar();
       await usuario.click(await screen.findByTitle("Editar técnico"));
 
       await usuario.upload(within(modal()).getByLabelText("Trocar foto (opcional)"), new File(["x"], "nova.png", { type: "image/png" }));
-      expect(within(modal()).getByAltText("Foto do técnico")).toHaveAttribute("src", "blob:tecnico");
+      expect(within(modal()).getByAltText("Foto do técnico")).toHaveAttribute("src", "blob:preview");
       await usuario.click(within(modal()).getByRole("button", { name: "Salvar" }));
 
       expect(apiMock.put.mock.calls[0][1]).toBeInstanceOf(FormData);
-      vi.unstubAllGlobals();
     });
 
     it("mostra erro da edição e mantém o modal", async () => {
