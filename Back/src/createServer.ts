@@ -8,7 +8,7 @@ import tecnicoRoutes from './routes/tecnicoRoutes';
 import { resolverArquivoDeUpload } from './utils/uploads';
 
 export function buildServer() {
-  const fastify = Fastify({ logger: true });
+  const fastify = Fastify({ logger: { level: process.env.LOG_LEVEL || 'info' } });
 
   fastify.register(multipartPlugin, {
     limits: { fileSize: 5 * 1024 * 1024 },
